@@ -431,6 +431,7 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="config.js"></script>
     <script>
         function test() {
             var tabsNewAnim = $('#navbarSupportedContent');
@@ -497,8 +498,14 @@
 
         // Fonction pour vérifier le statut Live
         function checkLiveStatus() {
-            const apiKey = 'AIzaSyASefFjQDPAYNWHI5mlsd6nmAVBe5MAb7s'; // Remplacez par votre clé API
-            const channelId = 'UCIEILBh69x5Iy0EJKtgkwtw'; // Remplacez par l'ID de la chaîne Theme Park Travellers
+            // Vérifier si config est défini
+            if (typeof config === 'undefined' || !config.youtubeApiKey) {
+                $('#live-status').text('Erreur : Clé API non configurée. Ajoutez config.js.');
+                return;
+            }
+
+            const apiKey = config.youtubeApiKey; // Utiliser la clé depuis config.js
+            const channelId = 'UCIEILBh69x5Iy0EJKtgkwtw'; // ID de la chaîne Theme Park Travellers
 
             $.getJSON(
                 `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`,
@@ -512,8 +519,9 @@
                         liveStatus.removeClass('live');
                     }
                 }
-            ).fail(function () {
-                $('#live-status').text('Erreur lors de la vérification du statut.');
+            ).fail(function (jqXHR, textStatus, errorThrown) {
+                $('#live-status').text('Erreur lors de la vérification du statut : ' + textStatus);
+                console.error('Erreur API :', errorThrown);
             });
         }
 
