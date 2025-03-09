@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +11,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="description" content="Une application PWA simple">
-    <link rel="shortcut icon" href="https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUDIfcUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj" type="image/x-icon">
-    <link rel="apple-touch-icon" href="https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUD2UbLSaXf59diUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj">
+    <link rel="shortcut icon"
+        href="https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUDIfcUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj"
+        type="image/x-icon">
+    <link rel="apple-touch-icon"
+        href="https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUD2UbLSaXf59diUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -19,29 +23,36 @@
             padding: 0;
             padding-bottom: 60px;
         }
+
         * {
             margin: 0;
             padding: 0;
         }
+
         .navbar-logo {
             padding: 15px;
             color: #fff;
         }
+
         .navbar-mainbg {
             background-color: #5161ce;
             padding: 0px;
         }
+
         #navbarSupportedContent {
             position: relative;
         }
+
         #navbarSupportedContent ul {
             padding: 0px;
             margin: 0px;
         }
+
         #navbarSupportedContent li {
             list-style-type: none;
             float: left;
         }
+
         #navbarSupportedContent ul li a {
             color: rgba(255, 255, 255, 0.5);
             text-decoration: none;
@@ -52,6 +63,7 @@
             transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
             position: relative;
         }
+
         #navbarSupportedContent ul li a svg {
             width: 20px;
             height: 20px;
@@ -60,14 +72,17 @@
             fill: rgba(255, 255, 255, 0.5);
             transition: fill 0.6s ease;
         }
+
         #navbarSupportedContent>ul>li.active>a {
             color: #5161ce;
             background-color: transparent;
             transition: all 0.7s;
         }
+
         #navbarSupportedContent>ul>li.active>a svg {
             fill: #5161ce;
         }
+
         .hori-selector {
             display: inline-block;
             position: absolute;
@@ -81,20 +96,24 @@
             border-top-right-radius: 15px;
             margin-top: 10px;
         }
+
         .hori-selector .right,
         .hori-selector .left {
             position: absolute;
             width: 25px;
             height: 25px;
             background-color: #fff;
-            bottom: 10px;
+            bottom: 0px;
         }
+
         .hori-selector .right {
             right: -25px;
         }
+
         .hori-selector .left {
             left: -25px;
         }
+
         .hori-selector .right:before,
         .hori-selector .left:before {
             content: '';
@@ -104,30 +123,35 @@
             border-radius: 50%;
             background-color: #5161ce;
         }
+
         .hori-selector .right:before {
             bottom: 0;
             right: -25px;
         }
+
         .hori-selector .left:before {
             bottom: 0;
             left: -25px;
         }
+
         #content {
-            padding: 20px;
             text-align: center;
-            min-height: calc(100vh - 60px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            min-height: calc(100vh - 120px);
         }
+
         .content-section {
             display: none;
             opacity: 0;
-            transition: opacity 0.5s ease; /* Animation de fondu */
+            transition: opacity 0.5s ease;
+            /* Animation de fondu */
         }
+
         .content-section.active {
-            display: block;
-            opacity: 1; /* Opacité à 1 quand actif */
+            display: flex;
+            opacity: 1;
+            flex-direction: column;
+            width: -webkit-fill-available;
+            /* Opacité à 1 quand actif */
         }
 
         @media(min-width: 992px) {
@@ -138,19 +162,35 @@
                 display: flex;
                 justify-content: center;
             }
+
             .navbar-expand-custom .navbar-nav {
                 -ms-flex-direction: row;
                 flex-direction: row;
             }
+
             .navbar-expand-custom .navbar-toggler {
                 display: none;
             }
+
             .navbar-expand-custom .navbar-collapse {
                 display: -ms-flexbox !important;
                 display: flex !important;
                 -ms-flex-preferred-size: auto;
                 flex-basis: auto;
             }
+
+            .hori-selector {
+                height: 50px !important;
+            }
+            
+            
+            /* Accueil  */
+            .bannerAccueil {
+                inline-size: -webkit-fill-available;
+                height: 155px;
+                object-fit: cover;
+            }
+            
         }
 
         @media (max-width: 991px) {
@@ -163,38 +203,47 @@
                 padding-bottom: 10px;
                 border-radius: 25px 25px 0px 0px;
             }
+
             .navbar-logo {
                 display: none;
             }
+
             .navbar-toggler {
                 display: none;
             }
+
             #navbarSupportedContent {
                 display: block !important;
             }
+
             #navbarSupportedContent ul {
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
                 height: 60px;
             }
+
             #navbarSupportedContent ul li {
                 float: none;
                 position: relative;
             }
+
             #navbarSupportedContent ul li a {
                 padding: 15px;
                 font-size: 0;
             }
+
             #navbarSupportedContent ul li a svg {
                 margin-right: 0;
                 width: 24px;
                 height: 24px;
                 fill: #fff;
             }
+
             #navbarSupportedContent>ul>li.active>a svg {
                 fill: #5161ce;
             }
+
             .hori-selector {
                 display: inline-block;
                 height: 40px;
@@ -205,16 +254,59 @@
                 border-radius: 50%;
                 margin-top: 0;
             }
+
             .hori-selector .right,
             .hori-selector .left {
                 display: none;
             }
+
+
+            
+        }
+
+
+
+        /* Accueil  */
+
+
+
+        /* Parcs */
+        #parcs {
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(-120px + 100vh);
+        }
+
+
+        /* Videos */
+        #videos {
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(-120px + 100vh);
+        }
+
+
+        /* calendrier */
+        #calendrier {
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(-120px + 100vh);
+        }
+
+
+        /* reseaux */
+        #reseaux {
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(-120px + 100vh);
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-custom navbar-mainbg">
-        <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
             <svg width="20" height="20">
                 <circle cx="10" cy="10" r="10" fill="white" />
             </svg>
@@ -228,8 +320,11 @@
                 <li class="nav-item active" data-section="accueil">
                     <a class="nav-link" href="javascript:void(0);">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                            <path d="M256 319.841c-35.346 0-64 28.654-64 64v128h128v-128c0-35.346-28.654-64-64-64z" opacity="1" />
-                            <path d="M362.667 383.841v128H448c35.346 0 64-28.654 64-64V253.26a42.665 42.665 0 0 0-12.011-29.696l-181.29-195.99c-31.988-34.61-85.976-36.735-120.586-4.747a85.355 85.355 0 0 0-4.747 4.747L12.395 223.5A42.669 42.669 0 0 0 0 253.58v194.261c0 35.346 28.654 64 64 64h85.333v-128c.399-58.172 47.366-105.676 104.073-107.044 58.604-1.414 108.814 46.899 109.261 107.044z" opacity="1" />
+                            <path d="M256 319.841c-35.346 0-64 28.654-64 64v128h128v-128c0-35.346-28.654-64-64-64z"
+                                opacity="1" />
+                            <path
+                                d="M362.667 383.841v128H448c35.346 0 64-28.654 64-64V253.26a42.665 42.665 0 0 0-12.011-29.696l-181.29-195.99c-31.988-34.61-85.976-36.735-120.586-4.747a85.355 85.355 0 0 0-4.747 4.747L12.395 223.5A42.669 42.669 0 0 0 0 253.58v194.261c0 35.346 28.654 64 64 64h85.333v-128c.399-58.172 47.366-105.676 104.073-107.044 58.604-1.414 108.814 46.899 109.261 107.044z"
+                                opacity="1" />
                         </svg>
                         Accueil
                     </a>
@@ -237,7 +332,9 @@
                 <li class="nav-item" data-section="parcs">
                     <a class="nav-link" href="javascript:void(0);">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M21.5 13h-1a7.485 7.485 0 0 1-2.306-.362A10.463 10.463 0 0 0 21 5.5C21 2.468 18.532 0 15.5 0S10 2.468 10 5.5c0 2.754 1.065 5.263 2.806 7.138A7.485 7.485 0 0 1 10.5 13C6.364 13 3 9.636 3 5.5a1.5 1.5 0 0 0-3 0v17a1.5 1.5 0 0 0 3 0v-9.659a10.55 10.55 0 0 0 2 1.6V22.5a1.5 1.5 0 0 0 3 0v-6.802a10.46 10.46 0 0 0 2 .289v6.512a1.5 1.5 0 0 0 3 0v-6.801a10.447 10.447 0 0 0 2-.713v7.514a1.5 1.5 0 0 0 3 0v-6.801a10.46 10.46 0 0 0 2 .289v6.512a1.5 1.5 0 0 0 3 0V14.5a1.5 1.5 0 0 0-1.5-1.5Zm-6-1.914A7.487 7.487 0 0 1 13 5.5C13 4.121 14.121 3 15.5 3S18 4.121 18 5.5a7.487 7.487 0 0 1-2.5 5.586Z" opacity="1" />
+                            <path
+                                d="M21.5 13h-1a7.485 7.485 0 0 1-2.306-.362A10.463 10.463 0 0 0 21 5.5C21 2.468 18.532 0 15.5 0S10 2.468 10 5.5c0 2.754 1.065 5.263 2.806 7.138A7.485 7.485 0 0 1 10.5 13C6.364 13 3 9.636 3 5.5a1.5 1.5 0 0 0-3 0v17a1.5 1.5 0 0 0 3 0v-9.659a10.55 10.55 0 0 0 2 1.6V22.5a1.5 1.5 0 0 0 3 0v-6.802a10.46 10.46 0 0 0 2 .289v6.512a1.5 1.5 0 0 0 3 0v-6.801a10.447 10.447 0 0 0 2-.713v7.514a1.5 1.5 0 0 0 3 0v-6.801a10.46 10.46 0 0 0 2 .289v6.512a1.5 1.5 0 0 0 3 0V14.5a1.5 1.5 0 0 0-1.5-1.5Zm-6-1.914A7.487 7.487 0 0 1 13 5.5C13 4.121 14.121 3 15.5 3S18 4.121 18 5.5a7.487 7.487 0 0 1-2.5 5.586Z"
+                                opacity="1" />
                         </svg>
                         Parcs
                     </a>
@@ -245,7 +342,9 @@
                 <li class="nav-item" data-section="videos">
                     <a class="nav-link" href="javascript:void(0);">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M17.5 1.917a6.4 6.4 0 0 0-5.5 3.3 6.4 6.4 0 0 0-5.5-3.3A6.8 6.8 0 0 0 0 8.967c0 4.547 4.786 9.513 8.8 12.88a4.974 4.974 0 0 0 6.4 0c4.014-3.367 8.8-8.333 8.8-12.88a6.8 6.8 0 0 0-6.5-7.05Z" opacity="1" />
+                            <path
+                                d="M17.5 1.917a6.4 6.4 0 0 0-5.5 3.3 6.4 6.4 0 0 0-5.5-3.3A6.8 6.8 0 0 0 0 8.967c0 4.547 4.786 9.513 8.8 12.88a4.974 4.974 0 0 0 6.4 0c4.014-3.367 8.8-8.333 8.8-12.88a6.8 6.8 0 0 0-6.5-7.05Z"
+                                opacity="1" />
                         </svg>
                         Vidéos
                     </a>
@@ -253,7 +352,9 @@
                 <li class="nav-item" data-section="calendrier">
                     <a class="nav-link" href="javascript:void(0);">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M24 7v1H0V7a5 5 0 0 1 5-5h1V1a1 1 0 0 1 2 0v1h8V1a1 1 0 0 1 2 0v1h1a5 5 0 0 1 5 5Zm0 10c0 3.86-3.141 7-7 7s-7-3.14-7-7 3.141-7 7-7 7 3.14 7 7Zm-5 .586-1-1V15a1 1 0 0 0-2 0v2c0 .265.105.52.293.707L17.586 19A1 1 0 0 0 19 17.586ZM8 17a8.98 8.98 0 0 1 3.349-7H0v9a5 5 0 0 0 5 5h6.349A8.98 8.98 0 0 1 8 17Z" opacity="1" />
+                            <path
+                                d="M24 7v1H0V7a5 5 0 0 1 5-5h1V1a1 1 0 0 1 2 0v1h8V1a1 1 0 0 1 2 0v1h1a5 5 0 0 1 5 5Zm0 10c0 3.86-3.141 7-7 7s-7-3.14-7-7 3.141-7 7-7 7 3.14 7 7Zm-5 .586-1-1V15a1 1 0 0 0-2 0v2c0 .265.105.52.293.707L17.586 19A1 1 0 0 0 19 17.586ZM8 17a8.98 8.98 0 0 1 3.349-7H0v9a5 5 0 0 0 5 5h6.349A8.98 8.98 0 0 1 8 17Z"
+                                opacity="1" />
                         </svg>
                         Calendrier
                     </a>
@@ -261,7 +362,9 @@
                 <li class="nav-item" data-section="reseaux">
                     <a class="nav-link" href="javascript:void(0);">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0Zm8.647 7h-3.221a19.676 19.676 0 0 0-2.821-4.644A10.031 10.031 0 0 1 20.647 7ZM16.5 12a10.211 10.211 0 0 1-.476 3H7.976a10.211 10.211 0 0 1-.476-3 10.211 10.211 0 0 1 .476-3h8.048a10.211 10.211 0 0 1 .476 3Zm-7.722 5h6.444A19.614 19.614 0 0 1 12 21.588 19.57 19.57 0 0 1 8.778 17Zm0-10A19.614 19.614 0 0 1 12 2.412 19.57 19.57 0 0 1 15.222 7ZM9.4 2.356A19.676 19.676 0 0 0 6.574 7H3.353A10.031 10.031 0 0 1 9.4 2.356ZM2.461 9H5.9a12.016 12.016 0 0 0-.4 3 12.016 12.016 0 0 0 .4 3H2.461a9.992 9.992 0 0 1 0-6Zm.892 8h3.221A19.676 19.676 0 0 0 9.4 21.644 10.031 10.031 0 0 1 3.353 17Zm11.252 4.644A19.676 19.676 0 0 0 17.426 17h3.221a10.031 10.031 0 0 1-6.042 4.644ZM21.539 15H18.1a12.016 12.016 0 0 0 .4-3 12.016 12.016 0 0 0-.4-3h3.437a9.992 9.992 0 0 1 0 6Z" opacity="1" />
+                            <path
+                                d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0Zm8.647 7h-3.221a19.676 19.676 0 0 0-2.821-4.644A10.031 10.031 0 0 1 20.647 7ZM16.5 12a10.211 10.211 0 0 1-.476 3H7.976a10.211 10.211 0 0 1-.476-3 10.211 10.211 0 0 1 .476-3h8.048a10.211 10.211 0 0 1 .476 3Zm-7.722 5h6.444A19.614 19.614 0 0 1 12 21.588 19.57 19.57 0 0 1 8.778 17Zm0-10A19.614 19.614 0 0 1 12 2.412 19.57 19.57 0 0 1 15.222 7ZM9.4 2.356A19.676 19.676 0 0 0 6.574 7H3.353A10.031 10.031 0 0 1 9.4 2.356ZM2.461 9H5.9a12.016 12.016 0 0 0-.4 3 12.016 12.016 0 0 0 .4 3H2.461a9.992 9.992 0 0 1 0-6Zm.892 8h3.221A19.676 19.676 0 0 0 9.4 21.644 10.031 10.031 0 0 1 3.353 17Zm11.252 4.644A19.676 19.676 0 0 0 17.426 17h3.221a10.031 10.031 0 0 1-6.042 4.644ZM21.539 15H18.1a12.016 12.016 0 0 0 .4-3 12.016 12.016 0 0 0-.4-3h3.437a9.992 9.992 0 0 1 0 6Z"
+                                opacity="1" />
                         </svg>
                         Réseaux
                     </a>
@@ -272,20 +375,21 @@
 
     <div id="content">
         <div id="accueil" class="content-section">
+            <img class="bannerAccueil"
+                src="https://yt3.googleusercontent.com/LnN7SGIyl-4CRsmNJTPK5gvIXP76c0ym2zZsq411fvq85aW5bVLwyTKyCYBu_dhE9qfxkkcf=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
+                alt="">
             <h1>Bienvenue sur la page d'accueil</h1>
-            <p>Ceci est la page principale du site.</p>
         </div>
         <div id="parcs" class="content-section active">
-            <h1>Nos Parcs</h1>
-            <p>Découvrez nos magnifiques parcs naturels.</p>
+            <h1>Les parcs visités</h1>
         </div>
         <div id="videos" class="content-section">
             <h1>Vidéos</h1>
-            <p>Regardez nos dernières vidéos.</p>
+            <p>Nos dernières vidéos/Lives</p>
         </div>
         <div id="calendrier" class="content-section">
             <h1>Calendrier</h1>
-            <p>Consultez nos événements à venir.</p>
+            <p>Les prochains lives prévus et jours de visite</p>
         </div>
         <div id="reseaux" class="content-section">
             <h1>Réseaux Sociaux</h1>
@@ -298,7 +402,7 @@
         function test() {
             var tabsNewAnim = $('#navbarSupportedContent');
             var activeItemNewAnim = tabsNewAnim.find('.active');
-            var activeWidthNewAnimHeight = activeItemNewAnim.innerHeight();
+            // var activeWidthNewAnimHeight = activeItemNewAnim.innerHeight();
             var activeWidthNewAnimWidth = activeItemNewAnim.innerWidth();
             var itemPosNewAnimTop = activeItemNewAnim.position();
             var itemPosNewAnimLeft = activeItemNewAnim.position();
@@ -307,7 +411,7 @@
                 $(".hori-selector").css({
                     "top": itemPosNewAnimTop.top + "px",
                     "left": itemPosNewAnimLeft.left + "px",
-                    "height": activeWidthNewAnimHeight + "px",
+                    "height": "50" + "px",
                     "width": activeWidthNewAnimWidth + "px"
                 });
             } else {
@@ -322,14 +426,14 @@
             var activeSection = activeItemNewAnim.data('section');
             $('.content-section').removeClass('active').css('opacity', '0');
             $('#' + activeSection).addClass('active');
-            setTimeout(function() {
+            setTimeout(function () {
                 $('#' + activeSection).css('opacity', '1');
             }, 50); // Petit délai pour déclencher la transition
 
             $("#navbarSupportedContent").on("click", "li", function (e) {
                 $('#navbarSupportedContent ul li').removeClass("active");
                 $(this).addClass('active');
-                var activeWidthNewAnimHeight = $(this).innerHeight();
+                // var activeWidthNewAnimHeight = $(this).innerHeight();
                 var activeWidthNewAnimWidth = $(this).innerWidth();
                 var itemPosNewAnimTop = $(this).position();
                 var itemPosNewAnimLeft = $(this).position();
@@ -338,7 +442,7 @@
                     $(".hori-selector").css({
                         "top": itemPosNewAnimTop.top + "px",
                         "left": itemPosNewAnimLeft.left + "px",
-                        "height": activeWidthNewAnimHeight + "px",
+                        "height": "50" + "px",
                         "width": activeWidthNewAnimWidth + "px"
                     });
                 } else {
@@ -352,10 +456,10 @@
                 // Gestion du fondu lors du changement
                 var section = $(this).data('section');
                 $('.content-section.active').css('opacity', '0'); // Fondu vers 0
-                setTimeout(function() {
+                setTimeout(function () {
                     $('.content-section').removeClass('active');
                     $('#' + section).addClass('active');
-                    setTimeout(function() {
+                    setTimeout(function () {
                         $('#' + section).css('opacity', '1'); // Fondu vers 1
                     }, 50); // Délai pour laisser le temps au display:none
                 }, 500); // Durée du fondu sortant (doit correspondre au CSS)
@@ -386,4 +490,5 @@
         });
     </script>
 </body>
+
 </html>
