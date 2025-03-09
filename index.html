@@ -143,7 +143,6 @@
             display: none;
             opacity: 0;
             transition: opacity 0.5s ease;
-            /* Animation de fondu */
         }
 
         .content-section.active {
@@ -151,7 +150,6 @@
             opacity: 1;
             flex-direction: column;
             width: -webkit-fill-available;
-            /* Opacité à 1 quand actif */
         }
 
         @media(min-width: 992px) {
@@ -182,15 +180,24 @@
             .hori-selector {
                 height: 50px !important;
             }
-            
-            
-            /* Accueil  */
+
             .bannerAccueil {
                 inline-size: -webkit-fill-available;
                 height: 155px;
                 object-fit: cover;
             }
-            
+
+            #live-status {
+                font-size: 24px;
+                color: #5161ce;
+                backdrop-filter: blur(18px);
+                background-color: #00000030;
+                width: max-content;
+                padding: 20px;
+                border: 1px #9f9f9f85 solid;
+                border-radius: 15px;
+            }
+
         }
 
         @media (max-width: 991px) {
@@ -260,15 +267,21 @@
                 display: none;
             }
 
+            
 
             
+            #live-status {
+                font-size: 15px;
+                color: #a1aeff;
+                backdrop-filter: blur(18px);
+                background-color: #00000030;
+                width: max-content;
+                padding: 15px;
+                border: 1px #9f9f9f85 solid;
+                border-radius: 10px;
+                justify-content: center;
+            }
         }
-
-
-
-        /* Accueil  */
-
-
 
         /* Parcs */
         #parcs {
@@ -277,7 +290,6 @@
             min-height: calc(-120px + 100vh);
         }
 
-
         /* Videos */
         #videos {
             flex-direction: column;
@@ -285,20 +297,37 @@
             min-height: calc(-120px + 100vh);
         }
 
-
-        /* calendrier */
+        /* Calendrier */
         #calendrier {
             flex-direction: column;
             justify-content: center;
             min-height: calc(-120px + 100vh);
         }
 
-
-        /* reseaux */
+        /* Réseaux */
         #reseaux {
             flex-direction: column;
             justify-content: center;
             min-height: calc(-120px + 100vh);
+        }
+
+        /* Statut Live */
+        .img1 {
+                height: calc(100vh - 150px);
+                border-radius: 20px;
+                margin: 15px;
+                background: url(https://images.unsplash.com/photo-1687392946857-96c2b7f94b0d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
+                background-size: cover;
+                background-repeat: no-repeat;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+        #live-status.live {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -375,10 +404,14 @@
 
     <div id="content">
         <div id="accueil" class="content-section">
-            <img class="bannerAccueil"
+            <!-- <img class="bannerAccueil"
                 src="https://yt3.googleusercontent.com/LnN7SGIyl-4CRsmNJTPK5gvIXP76c0ym2zZsq411fvq85aW5bVLwyTKyCYBu_dhE9qfxkkcf=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
-                alt="">
-            <h1>Bienvenue sur la page d'accueil</h1>
+                alt=""> -->
+            <!-- <h1>Bienvenue sur la page d'accueil</h1> -->
+            <div class="img1">
+                <div id="live-status">Vérification du statut en direct...</div>
+            </div>
+
         </div>
         <div id="parcs" class="content-section active">
             <h1>Les parcs visités</h1>
@@ -402,7 +435,6 @@
         function test() {
             var tabsNewAnim = $('#navbarSupportedContent');
             var activeItemNewAnim = tabsNewAnim.find('.active');
-            // var activeWidthNewAnimHeight = activeItemNewAnim.innerHeight();
             var activeWidthNewAnimWidth = activeItemNewAnim.innerWidth();
             var itemPosNewAnimTop = activeItemNewAnim.position();
             var itemPosNewAnimLeft = activeItemNewAnim.position();
@@ -422,18 +454,16 @@
                 });
             }
 
-            // Affichage initial avec fondu
             var activeSection = activeItemNewAnim.data('section');
             $('.content-section').removeClass('active').css('opacity', '0');
             $('#' + activeSection).addClass('active');
             setTimeout(function () {
                 $('#' + activeSection).css('opacity', '1');
-            }, 50); // Petit délai pour déclencher la transition
+            }, 50);
 
             $("#navbarSupportedContent").on("click", "li", function (e) {
                 $('#navbarSupportedContent ul li').removeClass("active");
                 $(this).addClass('active');
-                // var activeWidthNewAnimHeight = $(this).innerHeight();
                 var activeWidthNewAnimWidth = $(this).innerWidth();
                 var itemPosNewAnimTop = $(this).position();
                 var itemPosNewAnimLeft = $(this).position();
@@ -453,21 +483,48 @@
                     });
                 }
 
-                // Gestion du fondu lors du changement
                 var section = $(this).data('section');
-                $('.content-section.active').css('opacity', '0'); // Fondu vers 0
+                $('.content-section.active').css('opacity', '0');
                 setTimeout(function () {
                     $('.content-section').removeClass('active');
                     $('#' + section).addClass('active');
                     setTimeout(function () {
-                        $('#' + section).css('opacity', '1'); // Fondu vers 1
-                    }, 50); // Délai pour laisser le temps au display:none
-                }, 500); // Durée du fondu sortant (doit correspondre au CSS)
+                        $('#' + section).css('opacity', '1');
+                    }, 50);
+                }, 500);
+            });
+        }
+
+        // Fonction pour vérifier le statut Live
+        function checkLiveStatus() {
+            const apiKey = 'AIzaSyASefFjQDPAYNWHI5mlsd6nmAVBe5MAb7s'; // Remplacez par votre clé API
+            const channelId = 'UCIEILBh69x5Iy0EJKtgkwtw'; // Remplacez par l'ID de la chaîne Theme Park Travellers
+
+            $.getJSON(
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`,
+                function (data) {
+                    const liveStatus = $('#live-status');
+                    if (data.items && data.items.length > 0) {
+                        liveStatus.text('La chaîne est actuellement EN DIRECT !');
+                        liveStatus.addClass('live');
+                    } else {
+                        liveStatus.text('La chaîne n\'est pas en direct.');
+                        liveStatus.removeClass('live');
+                    }
+                }
+            ).fail(function () {
+                $('#live-status').text('Erreur lors de la vérification du statut.');
             });
         }
 
         $(document).ready(function () {
             setTimeout(function () { test(); });
+
+            // Vérifier le statut Live au chargement
+            checkLiveStatus();
+
+            // Rafraîchir le statut toutes les 60 secondes (optionnel)
+            setInterval(checkLiveStatus, 60000);
 
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
