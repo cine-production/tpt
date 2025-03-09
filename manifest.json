@@ -1,0 +1,21 @@
+{
+    "name": "Theme Park Travellers",
+    "short_name": "TPT",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#5161ce",
+    "theme_color": "#5161ce",
+    "description": "Une application pour TPT",
+    "icons": [
+      {
+        "src": "https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUD2UbLSaXf59diUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUD2UbLSaXf59diUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
