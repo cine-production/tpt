@@ -404,14 +404,11 @@
 
     <div id="content">
         <div id="accueil" class="content-section">
-            <!-- <img class="bannerAccueil"
+            <img class="bannerAccueil"
                 src="https://yt3.googleusercontent.com/LnN7SGIyl-4CRsmNJTPK5gvIXP76c0ym2zZsq411fvq85aW5bVLwyTKyCYBu_dhE9qfxkkcf=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
-                alt=""> -->
+                alt="">
             <!-- <h1>Bienvenue sur la page d'accueil</h1> -->
-            <div class="img1">
-                <div id="live-status">Vérification du statut en direct...</div>
-            </div>
-
+            
         </div>
         <div id="parcs" class="content-section active">
             <h1>Les parcs visités</h1>
@@ -431,7 +428,6 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="config.js"></script>
     <script>
         function test() {
             var tabsNewAnim = $('#navbarSupportedContent');
@@ -498,14 +494,8 @@
 
         // Fonction pour vérifier le statut Live
         function checkLiveStatus() {
-            // Vérifier si config est défini
-            if (typeof config === 'undefined' || !config.youtubeApiKey) {
-                $('#live-status').text('Erreur : Clé API non configurée. Ajoutez config.js.');
-                return;
-            }
-
-            const apiKey = config.youtubeApiKey; // Utiliser la clé depuis config.js
-            const channelId = 'UCIEILBh69x5Iy0EJKtgkwtw'; // ID de la chaîne Theme Park Travellers
+            const apiKey = 'AIzaSyASefFjQDPAYNWHI5mlsd6nmAVBe5MAb7s'; // Remplacez par votre clé API
+            const channelId = 'UCIEILBh69x5Iy0EJKtgkwtw'; // Remplacez par l'ID de la chaîne Theme Park Travellers
 
             $.getJSON(
                 `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`,
@@ -519,9 +509,8 @@
                         liveStatus.removeClass('live');
                     }
                 }
-            ).fail(function (jqXHR, textStatus, errorThrown) {
-                $('#live-status').text('Erreur lors de la vérification du statut : ' + textStatus);
-                console.error('Erreur API :', errorThrown);
+            ).fail(function () {
+                $('#live-status').text('Erreur lors de la vérification du statut.');
             });
         }
 
