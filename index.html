@@ -16,9 +16,19 @@
         type="image/x-icon">
     <link rel="apple-touch-icon"
         href="https://yt3.googleusercontent.com/n6auAEfZNK_SRWqHQfzn-4xhz4T4NUD2UbLSaXf59diUmjEZPKBZho8rXP7OfTn5isJdU2EscA=s160-c-k-c0x00ffffff-no-rj">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
     <style>
+        .questrial-regular {
+            font-family: "Questrial", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: "Questrial", sans-serif;
             margin: 0;
             padding: 0;
             padding-bottom: 60px;
@@ -260,6 +270,7 @@
                 background-color: #fff;
                 border-radius: 50%;
                 margin-top: 0;
+                box-shadow: #4d4d4d8f 2px 3px 9px;
             }
 
             .hori-selector .right,
@@ -267,9 +278,9 @@
                 display: none;
             }
 
-            
 
-            
+
+
             #live-status {
                 font-size: 15px;
                 color: #a1aeff;
@@ -307,27 +318,82 @@
         /* Réseaux */
         #reseaux {
             flex-direction: column;
-            justify-content: center;
             min-height: calc(-120px + 100vh);
+            display: flex;
+            align-items: center;
+            margin: 20px 0 20px 0;
         }
 
         /* Statut Live */
         .img1 {
-                height: calc(100vh - 150px);
-                border-radius: 20px;
-                margin: 15px;
-                background: url(https://images.unsplash.com/photo-1687392946857-96c2b7f94b0d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
-                background-size: cover;
-                background-repeat: no-repeat;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
+            height: calc(100vh - 150px);
+            border-radius: 20px;
+            margin: 15px;
+            background: url(https://images.unsplash.com/photo-1687392946857-96c2b7f94b0d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D);
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
         #live-status.live {
             color: red;
             font-weight: bold;
+        }
+
+
+
+        .contentReseaux {
+            height: 100vw;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            margin: 20px 0 20px 0;
+            justify-content: center;
+        }
+
+        .reseaux {
+            width: 90%;
+            height: 50px;
+            background-color: #e7e7e7;
+            border-radius: 10px;
+            display: flex;
+            padding: 5px;
+            margin: 5px;
+            border: solid 1px #ababab;
+            align-items: center;
+        }
+
+        .reseaux img {
+            width: 40px;
+            object-fit: contain;
+        }
+
+        .reseaux .div1 {
+            display: flex;
+            padding: 0 10px 0 5px;
+            height: 100%;
+            border-right: solid 1px #b5b5b58c;
+        }
+
+        .div2 {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            font-size: small;
+            margin: 0 0 0 7px;
+        }
+
+        .div2 a {
+            color: #5161ce;
+            font-weight: bold;
+        }
+
+        .div2 div {
+            margin: 3px;
         }
     </style>
 </head>
@@ -408,7 +474,7 @@
                 src="https://yt3.googleusercontent.com/LnN7SGIyl-4CRsmNJTPK5gvIXP76c0ym2zZsq411fvq85aW5bVLwyTKyCYBu_dhE9qfxkkcf=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
                 alt="">
             <!-- <h1>Bienvenue sur la page d'accueil</h1> -->
-            
+
         </div>
         <div id="parcs" class="content-section active">
             <h1>Les parcs visités</h1>
@@ -424,6 +490,37 @@
         <div id="reseaux" class="content-section">
             <h1>Réseaux Sociaux</h1>
             <p>Suivez-nous sur les réseaux !</p>
+            <div class="contentReseaux">
+                <div class="reseaux" id="discord">
+                    <div class="div1">
+                        <img src="https://logo-marque.com/wp-content/uploads/2020/11/Discord-Embleme.png" alt="">
+                    </div>
+                    <div class="div2">
+                        <div>
+                            <h2>Discord</h2>
+                        </div>
+                        <div>
+                            <p>Rejoignez-nous en cliquant sur <a href="https://discord.gg/gxTgtPvX7B">ce lien !</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reseaux" id="insta">
+                    <div class="div1">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1200px-Instagram_icon.png"
+                            alt="">
+                    </div>
+                    <div class="div2">
+                        <div>
+                            <h2>Instagram</h2>
+                        </div>
+                        <div>
+                            <p>Rejoignez-nous en cliquant sur <a
+                                    href="https://www.instagram.com/themeparktravellers?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==">ce
+                                    lien !</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
