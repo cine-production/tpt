@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DisneyParks Explorer</title>
+        <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+        <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#1E40AF", secondary: "#F59E0B" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+            rel="stylesheet" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+        <!-- Firebase SDK (Modulaire) -->
+        <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+      
+      import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+      import { getFirestore, collection, query, where, orderBy, limit, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyD1EGHhEUamTow1UPtPQWD-uiElBogQ66g",
+        authDomain: "tp-travelers.firebaseapp.com",
+        projectId: "tp-travelers",
+        storageBucket: "tp-travelers.firebasestorage.app",
+        messagingSenderId: "419470405151",
+        appId: "1:419470405151:web:b3f495a0b5857685ff2f2a"
+      };
+
+      // Initialisation Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // Exposer les objets nécessaires globalement
+      window.firebaseApp = {
+  auth, db, onAuthStateChanged, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, signOut,
+  collection, query, where, orderBy, limit,
+  getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, serverTimestamp,
+  addDoc
+};
+    </script>
+        <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      body {
+        font-family: 'Nunito', sans-serif;
+        padding-bottom: 70px;
+        padding-top: 60px;
+      }
+      .hidden { display: none; }
+    </style>
+    </head>
+    <body class="bg-gray-50">
+        <!-- Navigation supérieure -->
+        <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+  <div class="flex items-center justify-between px-4 py-3">
+    <h1 class="text-2xl font-['Pacifico'] text-primary">logo</h1>
+    <div class="flex items-center space-x-3">
+      <button id="notification-btn" class="w-8 h-8 flex items-center justify-center text-gray-600">
+        <i class="ri-notification-3-line ri-lg"></i>
+      </button>
+      <button id="user-btn" class="w-8 h-8 flex items-center justify-center text-gray-600">
+        <i class="ri-user-line ri-lg"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+        <!-- Contenu principal -->
+        <div id="main-content" class="px-4 py-4">
+            <!-- Page principale (Accueil) -->
+            <div id="home-page" class="page-content">
+                <!-- SECTION EN LIVE (à ajouter plus tard si besoin) -->
+
+                <!-- DERNIERS LIVES -->
+                <div id="live-banner-container" class="mb-6 hidden">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-red-500 text-white px-5 py-4 rounded-xl shadow-md animate-fade-in">
+    <div class="flex items-center space-x-3">
+      <div class="relative">
+        <span class="absolute inline-flex h-3 w-3 rounded-full bg-white opacity-75 animate-ping"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+      </div>
+      <span class="text-lg font-bold tracking-wide">EN LIVE</span>
+    </div>
+    <div class="mt-3 md:mt-0 flex gap-3">
+      <a id="live-banner-link" href="#" target="_blank"
+         class="bg-white text-red-600 px-4 py-2 rounded-button text-sm font-medium hover:bg-gray-100 transition">
+        Rejoindre le live
+      </a>
+      <button id="edit-live-banner" class="hidden bg-white text-blue-600 px-4 py-2 rounded-button text-sm font-medium hover:bg-blue-50 transition">
+        Modifier
+      </button>
+      <button id="stop-live-banner" class="hidden bg-white text-red-600 px-4 py-2 rounded-button text-sm font-medium hover:bg-red-50 transition">
+        Arrêter
+      </button>
+    </div>
+  </div>
+</div>
+
+                <!-- Bouton Définir en LIVE -->
+                <div class="mb-4 hidden" id="set-live-admin-container">
+                    <button id="set-live-btn"
+                        class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium">
+                        Définir en LIVE
+                    </button>
+                </div>
+
+                <div class="mb-8">
+  <h2 class="text-xl font-bold text-gray-800 mb-3">Derniers Lives YouTube</h2>
+  <div id="live-events" class="flex space-x-4 overflow-x-auto pb-2"></div>
+</div>
+
+
+
+                <hr class="my-6 border-gray-200" />
+
+                <!-- ACTUALITÉS -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2
+                            class="text-xl font-bold text-gray-800">Actualités</h2>
+                        <button id="add-news-btn"
+                            class="px-3 py-2 bg-primary text-white rounded-button text-sm flex items-center space-x-1 cursor-pointer hidden">
+                            <i
+                                class="ri-add-line w-4 h-4 flex items-center justify-center"></i>
+                            <span>Ajouter une actu</span>
+                        </button>
+                    </div>
+                    <div id="news-section" class="space-y-4">
+                        <!-- Les actualités seront chargées ici -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Calendrier -->
+            <div id="calendar-page" class="page-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">
+                        Calendrier des Événements
+                    </h2>
+                    <div class="flex space-x-2">
+                        <button id="filter-btn"
+                            class="px-3 py-2 bg-white border border-gray-200 rounded-button text-sm flex items-center space-x-1 cursor-pointer">
+                            <i
+                                class="ri-filter-3-line w-4 h-4 flex items-center justify-center"></i>
+                            <span>Filtrer</span>
+                        </button>
+                        <button id="add-event-btn"
+                            class="px-3 py-2 bg-primary text-white rounded-button text-sm flex items-center space-x-1 cursor-pointer hidden">
+                            <i
+                                class="ri-add-line w-4 h-4 flex items-center justify-center"></i>
+                            <span>Ajouter</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Filtre Modal -->
+                <div id="filter-modal"
+                    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+                        <h3 class="text-md font-semibold mb-4">Filtrer les
+                            événements</h3>
+                        <div class="space-y-2">
+                            <button
+                                class="filter-option w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200"
+                                data-filter="all">Tous</button>
+                            <button
+                                class="filter-option w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200"
+                                data-filter="Live">Live</button>
+                            <button
+                                class="filter-option w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200"
+                                data-filter="Visite">Visite</button>
+                            <button
+                                class="filter-option w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200"
+                                data-filter="Food">Food</button>
+                            <button
+                                class="filter-option w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200"
+                                data-filter="Nocturne">Nocturne</button>
+                        </div>
+                        <button id="close-filter-modal"
+                            class="w-full mt-4 bg-primary text-white py-2 rounded-button">Fermer</button>
+                    </div>
+                </div>
+                <!-- Sélecteur de mois -->
+                <div
+                    class="flex justify-between items-center mb-4 bg-white rounded-md p-3 shadow-sm">
+                    <button id="prev-month"
+                        class="w-8 h-8 flex items-center justify-center text-gray-600 cursor-pointer">
+                        <i class="ri-arrow-left-s-line ri-lg"></i>
+                    </button>
+                    <h3 id="month-display" class="text-base font-semibold">Juin
+                        2025</h3>
+                    <button id="next-month"
+                        class="w-8 h-8 flex items-center justify-center text-gray-600 cursor-pointer">
+                        <i class="ri-arrow-right-s-line ri-lg"></i>
+                    </button>
+                </div>
+                <!-- Jours de la semaine -->
+                <div
+                    class="grid grid-cols-7 text-center text-xs text-gray-500 mb-2">
+                    <div>Lun</div>
+                    <div>Mar</div>
+                    <div>Mer</div>
+                    <div>Jeu</div>
+                    <div>Ven</div>
+                    <div>Sam</div>
+                    <div>Dim</div>
+                </div>
+                <!-- Calendrier -->
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 mb-6">
+                    <!-- Les jours seront chargés dynamiquement -->
+                </div>
+                <!-- Événements du jour -->
+                <h3 id="events-title"
+                    class="text-md font-semibold mb-3">Événements du 19
+                    Juin</h3>
+                <div id="event-list" class="space-y-3 mb-8 event-list">
+                    <!-- Les événements seront chargés dynamiquement -->
+                </div>
+                <!-- Événements à venir -->
+                <h3 class="text-md font-semibold mb-3">Prochains événements</h3>
+                <div id="upcoming-events" class="space-y-3">
+                    <!-- Les événements à venir seront chargés dynamiquement -->
+                </div>
+            </div>
+
+            <!-- Page Évaluations -->
+            <div id="ratings-page" class="page-content hidden">
+                <h2
+                    class="text-xl font-bold text-gray-800 mb-6">Évaluations</h2>
+                <div id="ratings-list" class="space-y-4">
+                    <!-- Les évaluations seront chargées dynamiquement -->
+                </div>
+                <button id="add-rating-btn"
+                    class="mt-4 px-4 py-2 bg-primary text-white rounded-button w-full hidden">
+                    Ajouter une évaluation
+                </button>
+            </div>
+
+            <!-- Page Plus (Réseaux sociaux) -->
+            <div id="more-page" class="page-content hidden">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Nos Réseaux
+                    Sociaux</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="https://www.youtube.com/@DisneyParksExplorer"
+                        target="_blank"
+                        class="flex items-center space-x-3 bg-white rounded-md p-4 shadow-sm hover:bg-gray-100">
+                        <i class="ri-youtube-fill text-red-500 text-2xl"></i>
+                        <span class="text-gray-800 font-medium">YouTube</span>
+                    </a>
+                    <a href="https://x.com/DisneyParksExplorer" target="_blank"
+                        class="flex items-center space-x-3 bg-white rounded-md p-4 shadow-sm hover:bg-gray-100">
+                        <i class="ri-twitter-x-fill text-black text-2xl"></i>
+                        <span class="text-gray-800 font-medium">X</span>
+                    </a>
+                    <a href="https://www.instagram.com/DisneyParksExplorer"
+                        target="_blank"
+                        class="flex items-center space-x-3 bg-white rounded-md p-4 shadow-sm hover:bg-gray-100">
+                        <i class="ri-instagram-fill text-pink-500 text-2xl"></i>
+                        <span class="text-gray-800 font-medium">Instagram</span>
+                    </a>
+                    <a href="https://www.tiktok.com/@DisneyParksExplorer"
+                        target="_blank"
+                        class="flex items-center space-x-3 bg-white rounded-md p-4 shadow-sm hover:bg-gray-100">
+                        <i class="ri-tiktok-fill text-black text-2xl"></i>
+                        <span class="text-gray-800 font-medium">TikTok</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation inférieure -->
+        <nav
+            class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
+            <div class="grid grid-cols-4 h-16">
+                <a
+                    href="#home"
+                    class="nav-item flex flex-col items-center justify-center text-primary cursor-pointer"
+                    data-page="home-page">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-home-4-fill ri-lg"></i>
+                    </div>
+                    <span class="text-xs mt-1">Accueil</span>
+                </a>
+                <a
+                    href="#calendar"
+                    class="nav-item flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+                    data-page="calendar-page">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-calendar-2-line ri-lg"></i>
+                    </div>
+                    <span class="text-xs mt-1">Calendrier</span>
+                </a>
+                <a
+                    href="#ratings"
+                    class="nav-item flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+                    data-page="ratings-page">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-star-smile-line ri-lg"></i>
+                    </div>
+                    <span class="text-xs mt-1">Évaluations</span>
+                </a>
+                <a
+                    href="#more"
+                    class="nav-item flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+                    data-page="more-page">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-links-line ri-lg"></i>
+                    </div>
+                    <span class="text-xs mt-1">Plus</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Scripts -->
+        <script id="app-functionality">
+      document.addEventListener("DOMContentLoaded", function () {
+        // Vérifier que Firebase est chargé
+        if (!window.firebaseApp) {
+          console.error("Firebase n'est pas chargé correctement");
+          alert("Erreur de chargement de l'application. Veuillez recharger la page.");
+          return;
+        }
+
+
+        function convertToEmbedUrl(url) {
+  if (!url) return null;
+
+  // Match différents formats YouTube (watch, youtu.be, live)
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
+
+  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+}
+
+
+        const { auth, db, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, collection, query, where, orderBy, limit, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, serverTimestamp, addDoc } = window.firebaseApp;
+
+        let currentUser = null;
+        let userRole = null;
+        let currentMonth = new Date(2025, 5); // Juin 2025
+        let selectedDay = new Date().getDate();
+        const adminEmail = "admin@example.com"; // Remplacez par votre email admin réel
+
+        // Authentication state observer
+        onAuthStateChanged(auth, async user => {
+          currentUser = user;
+          userRole = null;
+          const addEventButton = document.getElementById("add-event-btn");
+          const addRatingButton = document.getElementById("add-rating-btn");
+          const addLiveButton = document.getElementById("add-live-btn");
+          const addNewsButton = document.getElementById("add-news-btn");
+          addNewsButton.addEventListener("click", () => {
+            const modal = document.createElement("div");
+            modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+            modal.innerHTML = `
+                <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+                <form id="newsForm" class="space-y-4">
+                    <h3 class="text-md font-semibold text-gray-800 mb-4">Ajouter une actualité</h3>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                    <input type="text" name="title" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" rows="3" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                    </div>
+                    <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Vidéo (optionnelle)</label>
+                    <input type="url" name="videoUrl"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div class="flex space-x-3 pt-4">
+                    <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelNewsBtn">Annuler</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Publier</button>
+                    </div>
+                </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const form = document.getElementById("newsForm");
+            document.getElementById("cancelNewsBtn").onclick = () => modal.remove();
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                try {
+                await setDoc(doc(collection(db, "news")), {
+                    title: data.title,
+                    description: data.description,
+                    videoUrl: data.videoUrl || null,
+                    createdAt: serverTimestamp(),
+                    createdBy: currentUser.uid
+                });
+
+                modal.remove();
+                loadHomePage(); // recharge pour afficher la nouvelle actu
+                } catch (error) {
+                console.error("Erreur lors de la publication :", error);
+                alert("Erreur lors de la publication de l'actualité");
+                }
+            });
+            });
+            
+
+            document.getElementById("set-live-btn").addEventListener("click", () => {
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+      <h3 class="text-lg font-semibold mb-4">Démarrer un LIVE</h3>
+      <form id="liveStatusForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Titre du live</label>
+          <input type="text" name="title" required placeholder="Nom du live"
+            class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL du live</label>
+          <input type="url" name="url" required placeholder="https://..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div class="flex space-x-2">
+          <button type="button" id="cancelLiveStatus" class="w-full py-2 bg-gray-100 text-gray-700 rounded-button">Annuler</button>
+          <button type="submit" class="w-full py-2 bg-primary text-white rounded-button">Démarrer</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById("cancelLiveStatus").onclick = () => modal.remove();
+
+  document.getElementById("liveStatusForm").onsubmit = async e => {
+    e.preventDefault();
+    const form = e.target;
+    const title = form.title.value;
+    const url = form.url.value;
+    try {
+      await setDoc(doc(db, "status", "liveStatus"), {
+        active: true,
+        url,
+        title,
+        updatedAt: serverTimestamp(),
+        createdBy: currentUser.uid
+      });
+      modal.remove();
+      loadHomePage();
+    } catch (err) {
+      alert("Erreur : " + err.message);
+    }
+  };
+});
+
+
+
+          if (user) {
+            // Récupérer le rôle de l'utilisateur depuis Firestore
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              userRole = userDocSnap.data().role;
+            }
+          }
+
+          const isAdmin = userRole === "admin";
+          addEventButton.classList.toggle("hidden", !isAdmin);
+          addRatingButton.classList.toggle("hidden", !isAdmin);
+        //   addLiveButton.classList.toggle("hidden", !isAdmin);
+          addNewsButton.classList.toggle("hidden", !isAdmin);
+
+          loadHomePage();
+          loadCalendar();
+          loadRatings();
+        });
+
+        // Navigation
+        const navItems = document.querySelectorAll(".nav-item");
+        const pages = document.querySelectorAll(".page-content");
+        
+        function showPage(pageId) {
+          pages.forEach(page => page.classList.add("hidden"));
+          document.getElementById(pageId).classList.remove("hidden");
+          
+          navItems.forEach(item => {
+            item.classList.remove("text-primary");
+            item.classList.add("text-gray-500");
+            const icon = item.querySelector("i");
+            if (icon) {
+              icon.classList.remove("ri-home-4-fill", "ri-calendar-2-fill", "ri-star-smile-fill", "ri-links-fill");
+              icon.classList.add(
+                item.getAttribute("data-page") === "home-page" ? "ri-home-4-line" :
+                item.getAttribute("data-page") === "calendar-page" ? "ri-calendar-2-line" :
+                item.getAttribute("data-page") === "ratings-page" ? "ri-star-smile-line" :
+                "ri-links-line"
+              );
+            }
+          });
+          const activeItem = document.querySelector(`[data-page="${pageId}"]`);
+          activeItem.classList.remove("text-gray-500");
+          activeItem.classList.add("text-primary");
+          const activeIcon = activeItem.querySelector("i");
+          if (activeIcon) {
+            activeIcon.classList.remove("ri-home-4-line", "ri-calendar-2-line", "ri-star-smile-line", "ri-links-line");
+            activeIcon.classList.add(
+              pageId === "home-page" ? "ri-home-4-fill" :
+              pageId === "calendar-page" ? "ri-calendar-2-fill" :
+              pageId === "ratings-page" ? "ri-star-smile-fill" :
+              "ri-links-fill"
+            );
+          }
+        }
+
+        navItems.forEach(item => {
+          item.addEventListener("click", function (e) {
+            e.preventDefault();
+            const pageId = this.getAttribute("data-page");
+            showPage(pageId);
+          });
+        });
+
+        // Initialize to home page
+        showPage("home-page");
+
+        
+
+        // Load Home Page
+        async function loadHomePage() {
+  const liveEvents = document.getElementById("live-events");
+  const newsSection = document.getElementById("news-section");
+  const isAdmin = userRole === "admin";
+  
+
+
+  // 👇 Affiche ou masque le bouton "Définir en LIVE"
+  document.getElementById("set-live-admin-container").classList.toggle("hidden", !isAdmin);
+
+  // 🔴 CHARGER LE STATUT EN LIVE
+  try {
+    const statusDoc = await getDoc(doc(db, "status", "liveStatus"));
+    const bannerContainer = document.getElementById("live-banner-container");
+    if (statusDoc.exists() && statusDoc.data().active && statusDoc.data().url) {
+      bannerContainer.classList.remove("hidden");
+      document.getElementById("live-banner-link").href = statusDoc.data().url;
+        if (isAdmin) {
+    document.getElementById("edit-live-banner").classList.remove("hidden");
+    document.getElementById("stop-live-banner").classList.remove("hidden");
+  }
+    } else {
+      bannerContainer.classList.add("hidden");
+    }
+  } catch (err) {
+    console.error("Erreur chargement statut live :", err);
+  }
+
+  // 🟥 MODIFIER LE LIVE
+document.getElementById("edit-live-banner").addEventListener("click", async () => {
+  const statusRef = doc(db, "status", "liveStatus");
+  const snap = await getDoc(statusRef);
+  const currentUrl = snap.exists() ? snap.data().url : "";
+
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+      <h3 class="text-lg font-semibold mb-4">Modifier l'URL du live</h3>
+      <form id="editLiveForm" class="space-y-4">
+        <input type="url" name="url" required placeholder="https://..." value="${currentUrl}"
+          class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        <div class="flex space-x-2">
+          <button type="button" class="w-full py-2 bg-gray-100 text-gray-700 rounded-button" id="cancelEditLive">Annuler</button>
+          <button type="submit" class="w-full py-2 bg-primary text-white rounded-button">Mettre à jour</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById("cancelEditLive").onclick = () => modal.remove();
+
+  document.getElementById("editLiveForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const url = e.target.url.value;
+    try {
+      await setDoc(statusRef, {
+        active: true,
+        url,
+        updatedAt: serverTimestamp()
+      });
+      modal.remove();
+      loadHomePage();
+    } catch (err) {
+      alert("Erreur : " + err.message);
+    }
+  };
+});
+
+
+
+
+
+
+  // 🔴 CHARGER LES DERNIERS LIVES
+  liveEvents.innerHTML = '<p class="text-gray-600">Chargement...</p>';
+  try {
+  const q = query(
+    collection(db, "events"),
+    orderBy("date", "desc"),
+    limit(5)
+  );
+  const snapshot = await getDocs(q);
+  liveEvents.innerHTML = snapshot.empty
+    ? '<p class="text-gray-600">Aucun live disponible</p>'
+    : '';
+
+  snapshot.forEach(doc => {
+  const event = doc.data();
+  if (event.type !== "Live") return;
+  const date = event.date.toDate();
+
+  const card = document.createElement("div");
+  card.className = "min-w-[160px] max-w-[160px] bg-white rounded-lg shadow-sm p-2 flex-shrink-0";
+
+  card.innerHTML = `
+    <div class="aspect-video mb-2">
+      <iframe class="w-full h-full rounded-md" src="${convertToEmbedUrl(event.youtubeUrl)}" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <h3 class="text-xs font-semibold text-gray-800 truncate">${event.title || 'Sans titre'}</h3>
+    <p class="text-[10px] text-gray-500">${date.toLocaleDateString('fr-FR')}</p>
+  `;
+
+  liveEvents.appendChild(card);
+});
+
+} catch (error) {
+  console.error("Erreur chargement des lives :", error);
+  liveEvents.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
+}
+
+
+  // 📰 CHARGER LES ACTUALITÉS
+  try {
+    const qNews = query(collection(db, "news"), orderBy("createdAt", "desc"), limit(10));
+    const snapshotNews = await getDocs(qNews);
+    newsSection.innerHTML = snapshotNews.empty
+      ? '<p class="text-gray-600">Aucune actualité pour le moment.</p>'
+      : '';
+
+    snapshotNews.forEach(doc => {
+      const news = doc.data();
+      newsSection.innerHTML += `
+        <div class="bg-white rounded-md p-4 shadow-sm">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800">${news.title || 'Sans titre'}</h3>
+              <p class="text-sm text-gray-600 mt-1">${news.description || ''}</p>
+            </div>
+            ${isAdmin ? `
+              <div class="flex space-x-2">
+                <button class="edit-news text-blue-500 text-sm font-medium cursor-pointer" data-id="${doc.id}">Modifier</button>
+                <button class="delete-news text-red-500 text-sm font-medium cursor-pointer" data-id="${doc.id}">Supprimer</button>
+              </div>
+            ` : ''}
+          </div>
+          ${news.videoUrl ? `
+  <div class="aspect-video mt-3">
+    <iframe class="w-full h-full rounded-md" src="${convertToEmbedUrl(news.videoUrl)}" frameborder="0" allowfullscreen></iframe>
+  </div>
+` : ''}
+
+        </div>
+      `;
+    });
+
+    // 🔄 Event handlers pour actus
+    document.querySelectorAll(".delete-news").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (confirm("Supprimer cette actualité ?")) {
+          await deleteDoc(doc(db, "news", btn.dataset.id));
+          loadHomePage();
+        }
+      });
+    });
+
+    document.querySelectorAll(".edit-news").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const ref = doc(db, "news", btn.dataset.id);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        // Réutilise ton modal d’ajout avec data déjà rempli
+        showNewsModal({ ...data, id: btn.dataset.id });
+      });
+    });
+
+  } catch (error) {
+    console.error("Erreur actualités :", error);
+    newsSection.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
+  }
+}
+        function showNewsModal(news) {
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+      <form id="newsForm" class="space-y-4">
+        <h3 class="text-md font-semibold text-gray-800 mb-4">${news.id ? "Modifier" : "Ajouter"} une actualité</h3>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+          <input type="text" name="title" required value="${news.title || ''}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea name="description" rows="3" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">${news.description || ''}</textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL Vidéo (optionnelle)</label>
+          <input type="url" name="videoUrl" value="${news.videoUrl || ''}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div class="flex space-x-3 pt-4">
+          <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelNewsBtn">Annuler</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Valider</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  document.getElementById("cancelNewsBtn").onclick = () => modal.remove();
+
+  document.getElementById("newsForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    try {
+      await setDoc(doc(db, "news", news.id), {
+        title: data.title,
+        description: data.description,
+        videoUrl: data.videoUrl || null,
+        createdAt: news.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        createdBy: currentUser.uid
+      });
+      modal.remove();
+      loadHomePage();
+    } catch (err) {
+      alert("Erreur lors de la mise à jour : " + err.message);
+    }
+  };
+}
+
+// Bouton profil (navbar)
+document.getElementById("user-btn").addEventListener("click", () => {
+  if (currentUser) {
+    // ✅ MODAL PROFIL
+    const userModal = document.createElement("div");
+    userModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+    userModal.innerHTML = `
+      <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+        <h4 class="font-bold text-md mb-4">Profil</h4>
+        <p class="text-gray-600 mb-2">Connecté en tant que ${currentUser.email}</p>
+        <p class="text-gray-600 mb-4">${userRole === 'admin' ? 'Administrateur' : 'Utilisateur'}</p>
+        <button id="logout-btn" class="w-full bg-red-500 text-white py-2 rounded-button mt-4">Se déconnecter</button>
+        <button id="cancel-user-btn" class="w-full bg-gray-100 text-gray-700 py-2 rounded-button mt-2">Fermer</button>
+      </div>
+    `;
+    document.body.appendChild(userModal);
+
+    document.getElementById("logout-btn").onclick = async () => {
+      try {
+        await signOut(auth);
+        userModal.remove();
+        alert("Déconnexion réussie");
+        loadHomePage();
+      } catch (error) {
+        alert("Erreur lors de la déconnexion: " + error.message);
+      }
+    };
+    document.getElementById("cancel-user-btn").onclick = () => userModal.remove();
+
+  } else {
+    // ✅ MODAL CONNEXION / INSCRIPTION
+    showLoginModal();
+  }
+});
+
+function showLoginModal(mode = "login") {
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  document.body.appendChild(modal);
+
+  function renderLogin() {
+    modal.innerHTML = `
+      <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+        <h4 class="font-bold text-md mb-4">Connexion</h4>
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-button">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+            <input type="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-button">
+          </div>
+          <div id="login-error" class="text-red-500 text-sm hidden"></div>
+          <div class="flex space-x-3 pt-4">
+            <button type="button" id="switch-to-signup" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button">S'inscrire</button>
+            <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button">Se connecter</button>
+          </div>
+          <button type="button" id="cancelLogin" class="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-button">Annuler</button>
+        </form>
+      </div>
+    `;
+
+    document.getElementById("loginForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      try {
+        await signInWithEmailAndPassword(auth, data.email, data.password);
+        modal.remove();
+        alert("Connexion réussie !");
+        loadHomePage();
+      } catch (err) {
+        const errorDiv = document.getElementById("login-error");
+        errorDiv.textContent = "Identifiants incorrects.";
+        errorDiv.classList.remove("hidden");
+      }
+    };
+
+    document.getElementById("switch-to-signup").onclick = () => renderSignup();
+    document.getElementById("cancelLogin").onclick = () => modal.remove();
+  }
+
+  function renderSignup() {
+    modal.innerHTML = `
+      <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+        <h4 class="font-bold text-md mb-4">Inscription</h4>
+        <form id="signupForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-button">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+            <input type="password" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-button">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Pseudonyme</label>
+            <input type="text" name="pseudo" required class="w-full px-3 py-2 border border-gray-300 rounded-button">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Avatar</label>
+            <select name="avatar" class="w-full px-3 py-2 border border-gray-300 rounded-button">
+              <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar1.png">Avatar 1</option>
+              <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar2.png">Avatar 2</option>
+              <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar3.png">Avatar 3</option>
+              <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar4.png">Avatar 4</option>
+              <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar5.png">Avatar 5</option>
+              <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar6.png">Avatar 6</option>
+            </select>
+          </div>
+          <div id="signup-error" class="text-red-500 text-sm hidden"></div>
+          <div class="flex space-x-3 pt-4">
+            <button type="button" id="switch-to-login" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button">Se connecter</button>
+            <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button">S'inscrire</button>
+          </div>
+          <button type="button" id="cancelSignup" class="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-button">Annuler</button>
+        </form>
+      </div>
+    `;
+
+    document.getElementById("signupForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        await setDoc(doc(db, "users", userCred.user.uid), {
+          uid: userCred.user.uid,
+          email: userCred.user.email,
+          pseudo: data.pseudo,
+          avatar: data.avatar,
+          role: "user",
+          createdAt: serverTimestamp()
+        });
+        modal.remove();
+        alert("Inscription réussie !");
+        loadHomePage();
+      } catch (error) {
+        const errorDiv = document.getElementById("signup-error");
+        errorDiv.textContent = error.code === "auth/email-already-in-use" ? "Email déjà utilisé." : error.message;
+        errorDiv.classList.remove("hidden");
+      }
+    };
+
+    document.getElementById("switch-to-login").onclick = () => renderLogin();
+    document.getElementById("cancelSignup").onclick = () => modal.remove();
+  }
+
+  // Affiche le bon écran
+  if (mode === "signup") renderSignup();
+  else renderLogin();
+}
+
+
+let stopLiveInProgress = false;
+
+document.getElementById("stop-live-banner").addEventListener("click", async () => {
+  if (stopLiveInProgress) return;
+  if (!confirm("Arrêter ce live et l’enregistrer ?")) return;
+
+  stopLiveInProgress = true;
+
+  try {
+    const liveRef = doc(db, "status", "liveStatus");
+    const liveSnap = await getDoc(liveRef);
+
+    if (liveSnap.exists() && liveSnap.data().active) {
+      const liveData = liveSnap.data();
+
+      await addDoc(collection(db, "events"), {
+        title: liveData.title || "Live sans titre",
+        youtubeUrl: liveData.url || null,
+        type: "Live",
+        date: new Date(),
+        createdBy: liveData.createdBy || currentUser?.uid || "unknown"
+      });
+
+      await setDoc(liveRef, {
+        active: false,
+        url: null,
+        title: null,
+        updatedAt: serverTimestamp()
+      });
+
+      loadHomePage();
+    }
+  } catch (err) {
+    alert("Erreur lors de l'arrêt du LIVE : " + err.message);
+  } finally {
+    stopLiveInProgress = false;
+  }
+});
+
+
+        // Load Calendar
+        async function loadCalendar(filter = "all") {
+          const calendarGrid = document.getElementById("calendar-grid");
+          const eventList = document.getElementById("event-list");
+          const upcomingEvents = document.getElementById("upcoming-events");
+          const monthDisplay = document.getElementById("month-display");
+          const eventsTitle = document.getElementById("events-title");
+
+          // Update month display
+          monthDisplay.textContent = currentMonth.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+          eventsTitle.textContent = `Événements du ${selectedDay} ${currentMonth.toLocaleString('fr-FR', { month: 'long' })}`;
+
+          // Generate calendar
+          const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+          const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+          const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+          
+          calendarGrid.innerHTML = '';
+          
+          // Previous month days
+          const prevMonthLastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 0).getDate();
+          for (let i = startDay - 1; i >= 0; i--) {
+            calendarGrid.innerHTML += `
+              <div class="aspect-square flex flex-col items-center justify-start p-1 bg-gray-100 rounded opacity-50">
+                <span class="text-xs">${prevMonthLastDay - i}</span>
+              </div>
+            `;
+          }
+
+          // Current month days
+          try {
+            const q = query(
+              collection(db, "events"),
+              where("date", ">=", new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)),
+              where("date", "<=", new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0))
+            );
+            const snapshot = await getDocs(q);
+            
+            const eventsByDay = {};
+            snapshot.forEach(doc => {
+              const event = doc.data();
+              const day = event.date && event.date.toDate ? event.date.toDate().getDate() : null;
+              if (day) {
+                if (!eventsByDay[day]) eventsByDay[day] = [];
+                eventsByDay[day].push({ id: doc.id, ...event });
+              }
+            });
+
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+              const hasEvents = eventsByDay[day] && eventsByDay[day].length > 0;
+              const isSelected = day === selectedDay;
+              const eventTypes = hasEvents ? [...new Set(eventsByDay[day].map(e => e.type))] : [];
+              
+              calendarGrid.innerHTML += `
+                <div class="aspect-square flex flex-col items-center justify-start p-1 ${isSelected ? 'bg-primary text-white' : 'bg-white'} rounded shadow-sm ${hasEvents ? 'cursor-pointer' : ''}"
+                     data-day="${day}" data-types="${eventTypes.join(',')}">
+                  <span class="text-xs ${isSelected ? 'font-bold text-white' : ''}">${day}</span>
+                  ${hasEvents ? `<div class="w-1.5 h-1.5 bg-${eventTypes[0] === 'Live' ? 'blue' : eventTypes[0] === 'Visite' ? 'amber' : eventTypes[0] === 'Food' ? 'red' : 'purple'}-500 rounded-full mt-1"></div>` : ''}
+                </div>
+              `;
+            }
+
+            // Load events for selected day
+            const isAdmin = userRole === "admin";
+            const filteredEvents = filter === "all" ? (eventsByDay[selectedDay] || []) : (eventsByDay[selectedDay] || []).filter(e => e.type === filter);
+            eventList.innerHTML = filteredEvents.length === 0 ? '<p class="text-gray-600">Aucun événement pour ce jour.</p>' : '';
+            
+            filteredEvents.forEach(event => {
+              const borderColor = {
+                Live: "border-primary",
+                Visite: "border-secondary",
+                Food: "border-red-500",
+                Nocturne: "border-purple-500"
+              }[event.type] || "border-gray-300";
+              const tagColor = {
+                Live: "bg-blue-100 text-primary",
+                Visite: "bg-amber-100 text-secondary",
+                Food: "bg-red-100 text-red-500",
+                Nocturne: "bg-purple-100 text-purple-500"
+              }[event.type] || "bg-gray-100 text-gray-500";
+              
+              eventList.innerHTML += `
+                <div class="bg-white rounded-md p-4 shadow-sm border-l-4 ${borderColor}" data-type="${event.type || 'N/A'}">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="font-semibold text-gray-800">${event.title || 'Sans titre'}</h4>
+                      <p class="text-sm text-gray-600 mt-1">${event.startTime || 'N/A'} - ${event.endTime || 'N/A'}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                      <span class="px-2 py-1 ${tagColor} text-xs rounded-full">${event.type || 'N/A'}</span>
+                      ${isAdmin ? `
+                        <button class="edit-event text-blue-500 text-sm font-medium cursor-pointer" data-event-id="${event.id}">Modifier</button>
+                        <button class="delete-event text-red-500 text-sm font-medium cursor-pointer" data-event-id="${event.id}">Supprimer</button>
+                      ` : ''}
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-700 mt-2">${event.description || 'Aucune description'}</p>
+                  <div class="flex justify-between items-center mt-3">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-6 h-6 flex items-center justify-center text-gray-500">
+                        <i class="ri-map-pin-line"></i>
+                      </div>
+                      <span class="text-xs text-gray-600">${event.location || 'Lieu non spécifié'}</span>
+                    </div>
+                    <button class="text-primary text-sm font-medium cursor-pointer" data-event-id="${event.id}">Détails</button>
+                  </div>
+                </div>
+              `;
+            });
+
+            // Load upcoming events
+            const now = new Date();
+            const upcomingQ = query(collection(db, "events"), where("date", ">", now), orderBy("date"), limit(5));
+            const upcomingSnapshot = await getDocs(upcomingQ);
+            
+            upcomingEvents.innerHTML = upcomingSnapshot.empty ? '<p class="text-gray-600">Aucun événement à venir</p>' : '';
+            
+            upcomingSnapshot.forEach(doc => {
+              const event = doc.data();
+              const date = event.date && event.date.toDate ? event.date.toDate() : new Date();
+              const tagColor = {
+                Live: "bg-blue-100 text-blue-500",
+                Visite: "bg-purple-100 text-purple-500",
+                Food: "bg-red-100 text-red-500",
+                Nocturne: "bg-purple-100 text-purple-500"
+              }[event.type] || "bg-gray-100 text-gray-500";
+              
+              upcomingEvents.innerHTML += `
+                <div class="bg-white rounded-md p-4 shadow-sm" data-type="${event.type || 'N/A'}">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 w-12 text-center">
+                      <span class="block text-sm font-semibold text-gray-800">${date.getDate()}</span>
+                      <span class="block text-xs text-gray-500">${date.toLocaleString('fr-FR', { month: 'short' })}</span>
+                    </div>
+                    <div class="ml-4">
+                      <h4 class="font-medium text-gray-800">${event.title || 'Sans titre'}</h4>
+                      <div class="flex items-center mt-1">
+                        <div class="w-4 h-4 flex items-center justify-center text-${event.type === 'Live' ? 'blue' : event.type === 'Visite' ? 'purple' : event.type === 'Food' ? 'red' : 'purple'}-500">
+                          <i class="ri-time-line"></i>
+                        </div>
+                        <span class="text-xs text-gray-600 ml-1">${event.startTime || 'N/A'} - ${event.endTime || 'N/A'}</span>
+                      </div>
+                    </div>
+                    <div class="ml-auto flex space-x-2">
+                      <span class="px-2 py-1 ${tagColor} text-xs rounded-full">${event.type || 'N/A'}</span>
+                      ${isAdmin ? `
+                        <button class="edit-event text-blue-500 text-sm font-medium cursor-pointer" data-event-id="${doc.id}">Modifier</button>
+                        <button class="delete-event text-red-500 text-sm font-medium cursor-pointer" data-event-id="${doc.id}">Supprimer</button>
+                      ` : ''}
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+
+            // Event listeners for calendar days
+            const calendarDays = calendarGrid.querySelectorAll("[data-day]");
+            calendarDays.forEach(day => {
+              day.addEventListener("click", function () {
+                selectedDay = parseInt(this.getAttribute("data-day"));
+                calendarDays.forEach(d => {
+                  d.classList.remove("bg-primary", "text-white");
+                  d.classList.add("bg-white");
+                  const span = d.querySelector("span");
+                  if (span) span.classList.remove("text-white", "font-bold");
+                });
+                this.classList.add("bg-primary", "text-white");
+                this.querySelector("span").classList.add("text-white", "font-bold");
+                eventsTitle.textContent = `Événements du ${selectedDay} ${currentMonth.toLocaleString('fr-FR', { month: 'long' })}`;
+                loadCalendar(filter);
+              });
+            });
+
+            // Event listeners for detail buttons
+            const detailButtons = eventList.querySelectorAll("button[data-event-id]");
+            detailButtons.forEach(button => {
+              button.addEventListener("click", async function () {
+                const eventId = this.getAttribute("data-event-id");
+                const docRef = doc(db, "events", eventId);
+                const docSnap = await getDoc(docRef);
+                const event = docSnap.data();
+                const eventDialog = document.createElement("div");
+                eventDialog.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+                eventDialog.innerHTML = `
+                  <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+                    <h4 class="font-bold text-md mb-4">${event.title || 'Sans titre'}</h4>
+                    <p class="text-gray-600 mb-2">${event.date && event.date.toDate ? event.date.toDate().toLocaleDateString('fr-FR') : 'Date non spécifiée'} ${event.startTime || 'N/A'} - ${event.endTime || 'N/A'}</p>
+                    <p class="text-gray-600 mb-2">${event.location || 'Lieu non spécifié'}</p>
+                    <p class="text-gray-600 mb-4">${event.description || 'Aucune description'}</p>
+                    <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
+                  </div>
+                `;
+                document.body.appendChild(eventDialog);
+                eventDialog.querySelector("button").onclick = () => eventDialog.remove();
+              });
+            });
+
+            // Event listeners for edit and delete buttons
+            document.querySelectorAll(".edit-event").forEach(button => {
+              button.addEventListener("click", () => editEvent(button.getAttribute("data-event-id")));
+            });
+            document.querySelectorAll(".delete-event").forEach(button => {
+              button.addEventListener("click", () => deleteEvent(button.getAttribute("data-event-id")));
+            });
+          } catch (error) {
+            console.error("Error loading calendar:", error);
+            eventList.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
+          }
+        }
+
+        // Load Ratings
+        async function loadRatings() {
+          const ratingsList = document.getElementById("ratings-list");
+          ratingsList.innerHTML = '<p class="text-gray-600">Chargement...</p>';
+          
+          try {
+            const q = query(collection(db, "ratings"), orderBy("createdAt", "desc"), limit(10));
+            const snapshot = await getDocs(q);
+            
+            ratingsList.innerHTML = snapshot.empty ? '<p class="text-gray-600">Aucune évaluation disponible</p>' : '';
+            
+            snapshot.forEach(doc => {
+              const rating = doc.data();
+              const date = rating.createdAt && rating.createdAt.toDate ? rating.createdAt.toDate() : new Date();
+              ratingsList.innerHTML += `
+                <div class="bg-white rounded-md p-4 shadow-sm">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="font-semibold text-gray-800">${rating.eventTitle || 'Sans titre'}</h4>
+                      <p class="text-sm text-gray-600 mt-1">${date.toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    <div class="flex">
+                      ${Array(5).fill(0).map((_, i) => `
+                        <i class="ri-star-${i < (rating.rating || 0) ? 'fill' : 'line'} text-yellow-400"></i>
+                      `).join('')}
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-700 mt-2">${rating.comment || 'Aucun commentaire'}</p>
+                </div>
+              `;
+            });
+          } catch (error) {
+            console.error("Error loading ratings:", error);
+            ratingsList.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
+          }
+        }
+
+        // Filters
+        const filterButton = document.getElementById("filter-btn");
+        const filterModal = document.getElementById("filter-modal");
+        const filterOptions = document.querySelectorAll(".filter-option");
+        const closeFilterModal = document.getElementById("close-filter-modal");
+
+        filterButton.addEventListener("click", () => {
+          filterModal.classList.remove("hidden");
+        });
+
+        filterOptions.forEach(option => {
+          option.addEventListener("click", function () {
+            const filter = this.getAttribute("data-filter");
+            loadCalendar(filter);
+            filterModal.classList.add("hidden");
+          });
+        });
+
+        closeFilterModal.addEventListener("click", () => {
+          filterModal.classList.add("hidden");
+        });
+
+        // Month navigation
+        document.getElementById("prev-month").addEventListener("click", () => {
+          currentMonth.setMonth(currentMonth.getMonth() - 1);
+          selectedDay = 1; // Réinitialiser au 1er jour du mois
+          loadCalendar();
+        });
+
+        document.getElementById("next-month").addEventListener("click", () => {
+          currentMonth.setMonth(currentMonth.getMonth() + 1);
+          selectedDay = 1; // Réinitialiser au 1er jour du mois
+          loadCalendar();
+        });
+
+        // Add/Edit Event
+        function createEventModal(eventData = null, isLive = false) {
+          const isEdit = !!eventData;
+          // Définition des valeurs par défaut pour éviter les undefined
+          const defaultData = {
+            title: '',
+            date: '',
+            type: isLive ? 'Live' : 'Live',
+            startTime: '',
+            endTime: '',
+            location: '',
+            description: '',
+            youtubeUrl: ''
+          };
+          const safeEventData = { ...defaultData, ...eventData };
+          
+          // Formatage sécurisé de la date
+          let formattedDate = '';
+          if (isEdit && safeEventData.date && safeEventData.date.toDate) {
+            try {
+              formattedDate = safeEventData.date.toDate().toISOString().split('T')[0];
+            } catch (e) {
+              console.error("Erreur de formatage de la date:", e);
+            }
+          }
+
+          const modal = document.createElement("div");
+          modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+          modal.innerHTML = `
+            <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+              <form id="eventForm" class="space-y-4">
+                <h3 class="text-md font-semibold text-gray-800 mb-4">${isEdit ? 'Modifier un événement' : isLive ? 'Ajouter un live' : 'Ajouter un événement'}</h3>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+                  <input type="text" name="title" value="${safeEventData.title}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" name="date" value="${formattedDate}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select name="type" ${isLive ? 'disabled' : ''} required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                      <option value="Live" ${isLive || safeEventData.type === 'Live' ? 'selected' : ''}>Live</option>
+                      <option value="Visite" ${safeEventData.type === 'Visite' ? 'selected' : ''}>Visite</option>
+                      <option value="Food" ${safeEventData.type === 'Food' ? 'selected' : ''}>Food</option>
+                      <option value="Nocturne" ${safeEventData.type === 'Nocturne' ? 'selected' : ''}>Nocturne</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Heure de début</label>
+                    <input type="time" name="startTime" value="${safeEventData.startTime}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Heure de fin</label>
+                    <input type="time" name="endTime" value="${safeEventData.endTime}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Lieu</label>
+                  <input type="text" name="location" value="${safeEventData.location}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea name="description" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">${safeEventData.description}</textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">URL YouTube (optionnel)</label>
+                  <input type="url" name="youtubeUrl" value="${safeEventData.youtubeUrl || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div id="event-error" class="text-red-500 text-sm hidden"></div>
+                <div class="flex space-x-3 pt-4">
+                  <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelEventBtn">Annuler</button>
+                  <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">${isEdit ? 'Modifier' : 'Enregistrer'}</button>
+                </div>
+              </form>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          const form = document.getElementById("eventForm");
+          const cancelBtn = document.getElementById("cancelEventBtn");
+          const errorDiv = document.getElementById("event-error");
+          cancelBtn.addEventListener("click", () => modal.remove());
+          
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (!currentUser || userRole !== "admin") {
+              errorDiv.textContent = "Vous devez être administrateur pour effectuer cette action";
+              errorDiv.classList.remove("hidden");
+              return;
+            }
+            
+            const formData = new FormData(form);
+            const eventData = Object.fromEntries(formData.entries());
+            try {
+              // Valider et formater la date
+              const eventDate = new Date(eventData.date);
+              if (isNaN(eventDate)) {
+                throw new Error("Format de date invalide");
+              }
+              
+              const dataToSave = {
+                title: eventData.title || "Sans titre",
+                date: eventDate,
+                type: isLive ? "Live" : eventData.type,
+                startTime: eventData.startTime || "00:00",
+                endTime: eventData.endTime || "00:00",
+                location: eventData.location || "Non spécifié",
+                description: eventData.description || "Aucune description",
+                youtubeUrl: eventData.youtubeUrl || null,
+                createdBy: currentUser.uid,
+                createdAt: serverTimestamp()
+              };
+              
+              if (isEdit) {
+                const eventRef = doc(db, "events", safeEventData.id);
+                await updateDoc(eventRef, {
+                  ...dataToSave,
+                  updatedBy: currentUser.uid,
+                  updatedAt: serverTimestamp()
+                });
+              } else {
+                await setDoc(doc(collection(db, "events")), dataToSave);
+              }
+              
+              const successModal = document.createElement("div");
+              successModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+              successModal.innerHTML = `
+                <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+                  <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
+                      <i class="ri-check-line text-green-500 text-2xl"></i>
+                    </div>
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Événement ${isEdit ? 'modifié' : 'créé'}</h4>
+                    <p class="text-gray-600 mb-4">L'événement a été ${isEdit ? 'modifié' : 'ajouté'} avec succès.</p>
+                    <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
+                  </div>
+                </div>
+              `;
+              modal.remove();
+              document.body.appendChild(successModal);
+              successModal.querySelector("button").onclick = () => {
+                successModal.remove();
+                loadCalendar();
+                loadHomePage();
+              };
+            } catch (error) {
+              console.error(`Error ${isEdit ? 'updating' : 'adding'} event:`, error);
+              errorDiv.textContent = `Erreur: ${error.message.includes("permission") ? "Permissions insuffisantes" : error.message}`;
+              errorDiv.classList.remove("hidden");
+            }
+          });
+        }
+
+        async function editEvent(eventId) {
+          try {
+            const docRef = doc(db, "events", eventId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const eventData = docSnap.data();
+              // Validation des données
+              if (!eventData) {
+                throw new Error("Données de l'événement introuvables");
+              }
+              // S'assurer que toutes les propriétés nécessaires existent
+              const validatedEventData = {
+                id: docSnap.id,
+                title: eventData.title || '',
+                date: eventData.date && eventData.date.toDate ? eventData.date : null,
+                type: eventData.type || 'Live',
+                startTime: eventData.startTime || '',
+                endTime: eventData.endTime || '',
+                location: eventData.location || '',
+                description: eventData.description || '',
+                youtubeUrl: eventData.youtubeUrl || ''
+              };
+              createEventModal(validatedEventData, validatedEventData.type === "Live");
+            } else {
+              throw new Error("L'événement n'existe pas");
+            }
+          } catch (error) {
+            console.error("Error loading event for edit:", error);
+            const errorModal = document.createElement("div");
+            errorModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+            errorModal.innerHTML = `
+              <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+                <h4 class="font-bold text-md mb-4">Erreur</h4>
+                <p class="text-gray-600 mb-4">Impossible de charger l'événement: ${error.message}</p>
+                <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
+              </div>
+            `;
+            document.body.appendChild(errorModal);
+            errorModal.querySelector("button").onclick = () => errorModal.remove();
+          }
+        }
+
+        async function deleteEvent(eventId) {
+          if (!currentUser || userRole !== "admin") {
+            alert("Vous devez être administrateur pour effectuer cette action");
+            return;
+          }
+          
+          if (!confirm("Voulez-vous vraiment supprimer cet événement ?")) return;
+          
+          try {
+            await deleteDoc(doc(db, "events", eventId));
+            const successModal = document.createElement("div");
+            successModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+            successModal.innerHTML = `
+              <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+                <div class="text-center">
+                  <div class="w-12 h-12 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
+                    <i class="ri-check-line text-green-500 text-2xl"></i>
+                  </div>
+                  <h4 class="text-md font-semibold text-gray-800 mb-2">Événement supprimé</h4>
+                  <p class="text-gray-600 mb-4">L'événement a été supprimé avec succès.</p>
+                  <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
+                </div>
+              </div>
+            `;
+            document.body.appendChild(successModal);
+            successModal.querySelector("button").onclick = () => {
+              successModal.remove();
+              loadCalendar();
+              loadHomePage();
+            };
+          } catch (error) {
+            console.error("Error deleting event:", error);
+            alert("Erreur lors de la suppression de l'événement");
+          }
+        }
+
+        // Add Live Event
+        const addLiveButton = document.getElementById("add-live-btn");
+        addLiveButton.addEventListener("click", () => createEventModal(null, true));
+
+        // Add Event
+        const addEventButton = document.getElementById("add-event-btn");
+        addEventButton.addEventListener("click", () => createEventModal());
+
+        // Add Rating
+        const addRatingButton = document.getElementById("add-rating-btn");
+        addRatingButton.addEventListener("click", () => {
+          if (!currentUser || userRole !== "admin") {
+            alert("Vous devez être administrateur pour ajouter une évaluation");
+            return;
+          }
+          
+          const modal = document.createElement("div");
+          modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+          modal.innerHTML = `
+            <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+              <form id="ratingForm" class="space-y-4">
+                <h3 class="text-md font-semibold text-gray-800 mb-4">Ajouter une évaluation</h3>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Événement</label>
+                  <select name="eventTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="">Sélectionnez un événement</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Note</label>
+                  <select name="rating" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <option value="1">1 étoile</option>
+                    <option value="2">2 étoiles</option>
+                    <option value="3">3 étoiles</option>
+                    <option value="4">4 étoiles</option>
+                    <option value="5">5 étoiles</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Commentaire</label>
+                  <textarea name="comment" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                </div>
+                <div id="rating-error" class="text-red-500 text-sm hidden"></div>
+                <div class="flex space-x-3 pt-4">
+                  <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelRatingBtn">Annuler</button>
+                  <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Enregistrer</button>
+                </div>
+              </form>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          
+          // Load events for selection
+          const q = query(collection(db, "events"), orderBy("date", "desc"), limit(20));
+          getDocs(q).then(snapshot => {
+            const select = modal.querySelector('select[name="eventTitle"]');
+            snapshot.forEach(doc => {
+              const event = doc.data();
+              const option = document.createElement("option");
+              option.value = event.title || 'Sans titre';
+              option.textContent = `${event.title || 'Sans titre'} (${event.date && event.date.toDate ? event.date.toDate().toLocaleDateString('fr-FR') : 'Date non spécifiée'})`;
+              select.appendChild(option);
+            });
+          });
+          
+          const form = document.getElementById("ratingForm");
+          const cancelBtn = document.getElementById("cancelRatingBtn");
+          const errorDiv = document.getElementById("rating-error");
+          cancelBtn.addEventListener("click", () => modal.remove());
+          
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const ratingData = Object.fromEntries(formData.entries());
+            try {
+              await setDoc(doc(collection(db, "ratings")), {
+                eventTitle: ratingData.eventTitle,
+                rating: parseInt(ratingData.rating),
+                comment: ratingData.comment,
+                userId: currentUser.uid,
+                createdAt: serverTimestamp()
+              });
+              
+              const successModal = document.createElement("div");
+              successModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+              successModal.innerHTML = `
+                <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+                  <div class="text-center">
+                    <div class="w-12 h-12 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
+                      <i class="ri-check-line text-green-500 text-2xl"></i>
+                    </div>
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Évaluation ajoutée</h4>
+                    <p class="text-gray-600 mb-4">Votre évaluation a été enregistrée avec succès.</p>
+                    <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
+                  </div>
+                </div>
+              `;
+              modal.remove();
+              document.body.appendChild(successModal);
+              successModal.querySelector("button").onclick = () => {
+                successModal.remove();
+                loadRatings();
+              };
+            } catch (error) {
+              console.error("Error adding rating:", error);
+              errorDiv.textContent = `Erreur: ${error.message.includes("permission") ? "Permissions insuffisantes" : error.message}`;
+              errorDiv.classList.remove("hidden");
+            }
+          });
+        });
+        
+
+        // Header buttons
+        // Header buttons
+const headerButtons = document.querySelectorAll("nav.fixed.top-0 button");
+
+headerButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    const iconClass = this.querySelector("i").className;
+
+    // Notif
+    if (iconClass.includes("notification")) {
+      alert("Affichage des notifications (à implémenter)");
+      return;
+    }
+
+    // Profil
+    if (iconClass.includes("user")) {
+      // Si connecté → ouvrir le modal profil
+      if (currentUser) {
+        const userModal = document.createElement("div");
+        userModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+        userModal.innerHTML = `
+          <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+            <h4 class="font-bold text-md mb-4">Profil</h4>
+            <p class="text-gray-600 mb-2">Connecté en tant que ${currentUser.email}</p>
+            <p class="text-gray-600 mb-4">${userRole === 'admin' ? 'Administrateur' : 'Utilisateur'}</p>
+            <button id="logout-btn" class="w-full bg-red-500 text-white py-2 rounded-button mt-4">Se déconnecter</button>
+            <button id="cancel-user-btn" class="w-full bg-gray-100 text-gray-700 py-2 rounded-button mt-2">Fermer</button>
+          </div>
+        `;
+        document.body.appendChild(userModal);
+
+        document.getElementById("logout-btn").onclick = async () => {
+          try {
+            await signOut(auth);
+            userModal.remove();
+            alert("Déconnexion réussie.");
+          } catch (error) {
+            alert("Erreur lors de la déconnexion : " + error.message);
+          }
+        };
+        document.getElementById("cancel-user-btn").onclick = () => userModal.remove();
+
+      } else {
+        // Sinon, ouvrir modal connexion
+        showLoginModal();
+      }
+    }
+  });
+});
+
+// Fonction pour afficher le modal de connexion / inscription
+function showLoginModal() {
+  const loginModal = document.createElement("div");
+  loginModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+
+  function renderLogin() {
+  loginModal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+      <h4 class="font-bold text-md mb-4">Connexion</h4>
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" name="email" required class="w-full px-3 py-2 border rounded-button">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+          <input type="password" name="password" required class="w-full px-3 py-2 border rounded-button">
+        </div>
+        <div id="login-error" class="text-red-500 text-sm hidden"></div>
+        <div class="flex space-x-3 pt-4">
+          <button type="button" id="switch-to-signup">S'inscrire</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button">Se connecter</button>
+        </div>
+        <button type="button" id="cancelLogin" class="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-button">Annuler</button>
+      </form>
+    </div>
+  `;
+
+  // ✅ Ces listeners doivent être ajoutés **après** le innerHTML
+  document.getElementById("loginForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      loginModal.remove();
+      alert("Connexion réussie !");
+    } catch {
+      const errorDiv = document.getElementById("login-error");
+      errorDiv.textContent = "Identifiants incorrects.";
+      errorDiv.classList.remove("hidden");
+    }
+  };
+
+  document.getElementById("switch-to-signup").onclick = renderSignup;
+  document.getElementById("cancelLogin").onclick = () => loginModal.remove();
+}
+
+  function renderSignup() {
+  loginModal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+      <h4 class="font-bold text-md mb-4">Inscription</h4>
+      <form id="signupForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" name="email" required class="w-full px-3 py-2 border rounded-button">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+          <input type="password" name="password" required class="w-full px-3 py-2 border rounded-button">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pseudonyme</label>
+          <input type="text" name="pseudo" required class="w-full px-3 py-2 border rounded-button">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Avatar</label>
+          <select name="avatar" class="w-full px-3 py-2 border rounded-button">
+            
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar1.png">Avatar 1</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar2.png">Avatar 2</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar3.png">Avatar 3</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar4.png">Avatar 4</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar5.png">Avatar 5</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar6.png">Avatar 6</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar7.png">Avatar 7</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar8.png">Avatar 8</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar9.png">Avatar 9</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar10.png">Avatar 10</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar11.png">Avatar 11</option>
+            <option value="https://cine-production.github.io/ServiceTiers/BASEDONNEE/CP/images/avatar/avatar12.png">Avatar 12</option>
+          </select>
+        </div>
+        <div id="signup-error" class="text-red-500 text-sm hidden"></div>
+        <div class="flex space-x-3 pt-4">
+          <button type="button" id="switch-to-login" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button">Se connecter</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button">S'inscrire</button>
+        </div>
+        <button type="button" id="cancelSignup" class="w-full mt-2 bg-gray-100 text-gray-700 py-2 rounded-button">Annuler</button>
+      </form>
+    </div>
+  `;
+
+  document.getElementById("signupForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        uid: userCred.user.uid,
+        email: userCred.user.email,
+        pseudo: data.pseudo,
+        avatar: data.avatar,
+        role: "user",
+        createdAt: serverTimestamp()
+      });
+      loginModal.remove();
+      alert("Inscription réussie !");
+    } catch (error) {
+      const errorDiv = document.getElementById("signup-error");
+      errorDiv.textContent = error.code === "auth/email-already-in-use"
+        ? "Email déjà utilisé."
+        : error.message;
+      errorDiv.classList.remove("hidden");
+    }
+  };
+
+  document.getElementById("switch-to-login").onclick = renderLogin;
+  document.getElementById("cancelSignup").onclick = () => loginModal.remove();
+}
+
+  renderLogin();
+  renderSignup();
+}
+
+      });
+    </script>
+    </body>
+</html>
