@@ -124,6 +124,31 @@
   border-radius: 1.5px;
   transition: all 0.2s ease;
 }
+.switch {
+  width: 40px;
+  height: 20px;
+  background: #ccc;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+}
+.switch:checked {
+  background: #4CAF50;
+}
+.switch:checked::after {
+  transform: translateX(20px);
+}
+.switch::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+}
     </style>
   </head>
   <body class="bg-gray-50">
@@ -376,11 +401,11 @@
 
         <!-- Expand list -->
         <li>
-          <button class=" BtnAddAll nav__expand" id="nav-expand">
+          <button class="hidden BtnAddAll nav__expand" id="nav-expand">
             <i class="ri-add-line nav__expand-icon" id="nav-expand-icon"></i>
           </button>
 
-          <ul class="nav__expand-list" id="nav-expand-list">
+          <ul class="hidden BtnAddAll nav__expand-list" id="nav-expand-list">
             <button id="add-event-btn">
               <li>
                 <a class="nav__expand-link ">
@@ -496,12 +521,116 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
           document.querySelectorAll(".BtnAddAll").forEach(element => {element.classList.toggle("hidden", !isAdmin);});
           loadHomePage();
           loadRatings();
+
+          
+
+// Fonction utilitaire pour convertir la clé VAPID
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
         });
 
-        document.getElementById("send-notification-btn").addEventListener("click", showNotificationModal);
+        const notificationTokens = {
+      Live: "Asv8QMoGjRLvnt5",
+      Événement: "ASDxBoLF6kzaXJu",
+      News: "A0.9MnCeCmWk45I"
+    };
 
-        async function sendNotification(title, message, priority = 5) {
-  const url = "http://furcity.duckdns.org:8183/message?token=A1M_i1uoFoXjHdQ";
+    // Initialiser et charger les préférences depuis Firestore
+    let userPreferences = { Live: false, Événement: false, News: false };
+    async function loadPreferences() {
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            userPreferences = { ...userPreferences, ...data.notificationPrefs };
+          }
+          console.log("Préférences chargées:", userPreferences);
+        } catch (error) {
+          console.error("Erreur lors du chargement des préférences:", error);
+        }
+      }
+      return userPreferences;
+    }
+
+
+
+    // ... (code existant jusqu'à la fin de onAuthStateChanged)
+
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  let registration;
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => {
+      registration = reg;
+      console.log('Service Worker enregistré avec succès:', registration);
+      return reg.pushManager.getSubscription();
+    })
+    .then(subscription => {
+      if (!subscription) {
+        // Inscription au push si pas encore fait
+        const vapidPublicKey = 'BPDjj65QpMK9iFxwComOpSQdt7ICAk70Gm6Y8xMo-XafUeby-Mq6S4p3Yuc3sW1mmvS2dKQ4yNDfx1eOTpvMTaQ'; // Remplacez par votre clé VAPID publique de Gotify
+        const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+        return registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedVapidKey
+        });
+      }
+      return subscription;
+    })
+    .then(subscription => {
+      console.log('Abonnement Push:', subscription);
+      // Envoyer l'abonnement à Gotify ou Firebase (nécessite une API personnalisée)
+      if (currentUser) {
+        setDoc(doc(db, "users", currentUser.uid), { pushSubscription: subscription.toJSON() }, { merge: true })
+          .then(() => console.log("Abonnement Push sauvegardé dans Firestore"))
+          .catch(error => console.error("Erreur sauvegarde abonnement:", error));
+      }
+    })
+    .catch(error => {
+      console.error('Erreur d\'inscription Push:', error);
+    });
+}
+
+// Fonction utilitaire pour convertir la clé VAPID
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+// ... (reste du code existant après loadRatings)
+
+
+
+    // Fonction pour sauvegarder les préférences dans Firestore
+    async function savePreferences() {
+      if (currentUser) {
+        try {
+          await setDoc(doc(db, "users", currentUser.uid), { notificationPrefs: userPreferences }, { merge: true });
+          console.log("Préférences sauvegardées:", userPreferences);
+        } catch (error) {
+          console.error("Erreur lors de la sauvegarde des préférences:", error);
+        }
+      }
+    }
+
+    // Fonction pour envoyer une notification via Gotify avec débogage
+    async function sendNotification(title, message, priority, token) {
+  const url = `http://furcity.duckdns.org:8183/message?token=${token}`;
+  console.log(`Tentative d'envoi à ${url} avec token ${token}, titre: ${title}, message: ${message}, priorité: ${priority}`);
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -510,11 +639,13 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
     });
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
     }
-    return await response.json();
+    const result = await response.json();
+    console.log("Notification envoyée avec succès:", result);
+    return result;
   } catch (error) {
-    console.error("Erreur détaillée:", error);
+    console.error(`Erreur pour le token ${token}:`, error.message);
     throw error;
   }
 }
@@ -544,6 +675,14 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
               <label class="block text-sm font-medium text-gray-700 mb-1">Priorité (1-5)</label>
               <input type="number" name="priority" min="1" max="5" value="5" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Type(s) de notification</label>
+              <select name="types" multiple required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary h-24">
+                <option value="Live">Live</option>
+                <option value="Événement">Événement</option>
+                <option value="News">News</option>
+              </select>
+            </div>
             <div id="notification-error" class="text-red-500 text-sm hidden"></div>
             <div class="flex space-x-3 pt-4">
               <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelNotificationBtn">Annuler</button>
@@ -565,9 +704,18 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
         const priority = parseInt(data.priority);
+        const selectedTypes = form.querySelector("select[name=types]").selectedOptions;
 
         try {
-          await sendNotification(data.title, data.body, priority);
+          const promises = [];
+          for (let option of selectedTypes) {
+            const type = option.value;
+            const token = notificationTokens[type];
+            if (userPreferences[type]) { // Vérifie si la notification est activée pour ce type
+              promises.push(sendNotification(data.title, data.body, priority, token));
+            }
+          }
+          await Promise.all(promises);
           modal.remove();
           const successModal = document.createElement("div");
           successModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
@@ -577,8 +725,8 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
                 <div class="w-12 h-12 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
                   <i class="ri-check-line text-green-500 text-2xl"></i>
                 </div>
-                <h4 class="text-md font-semibold text-gray-800 mb-2">Notification envoyée</h4>
-                <p class="text-gray-600 mb-4">La notification a été envoyée avec succès.</p>
+                <h4 class="text-md font-semibold text-gray-800 mb-2">Notification(s) envoyée(s)</h4>
+                <p class="text-gray-600 mb-4">Les notifications ont été envoyées avec succès.</p>
                 <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
               </div>
             </div>
@@ -592,6 +740,109 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
         }
       });
     }
+
+    // Modal pour activer/désactiver les notifications avec switches stylisés
+    async function showNotificationSettingsModal() {
+      await loadPreferences();
+
+      const modal = document.createElement("div");
+      modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+      modal.innerHTML = `
+        <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+          <h3 class="text-md font-semibold text-gray-800 mb-4">Paramètres des notifications</h3>
+          <div class="space-y-4">
+            <label class="flex items-center space-x-3">
+              <input type="checkbox" id="liveSwitch" class="toggle-switch" ${userPreferences.Live ? "checked" : ""}>
+              <span class="text-sm font-medium text-gray-700">Live</span>
+            </label>
+            <label class="flex items-center space-x-3">
+              <input type="checkbox" id="eventSwitch" class="toggle-switch" ${userPreferences.Événement ? "checked" : ""}>
+              <span class="text-sm font-medium text-gray-700">Événement</span>
+            </label>
+            <label class="flex items-center space-x-3">
+              <input type="checkbox" id="newsSwitch" class="toggle-switch" ${userPreferences.News ? "checked" : ""}>
+              <span class="text-sm font-medium text-gray-700">News</span>
+            </label>
+          </div>
+          <div class="flex justify-end pt-4">
+            <button id="saveSettingsBtn" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Sauvegarder</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      const style = document.createElement("style");
+      style.textContent = `
+        .toggle-switch {
+          width: 50px;
+          height: 24px;
+          position: relative;
+          appearance: none;
+          background: #e5e7eb;
+          border-radius: 12px;
+          outline: none;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
+        .toggle-switch:checked {
+          background: #10b981;
+        }
+        .toggle-switch::before {
+          content: '';
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          top: 2px;
+          left: 2px;
+          background: white;
+          border-radius: 50%;
+          transition: transform 0.3s;
+        }
+        .toggle-switch:checked::before {
+          transform: translateX(26px);
+        }
+      `;
+      document.head.appendChild(style);
+
+      const liveSwitch = modal.querySelector("#liveSwitch");
+      const eventSwitch = modal.querySelector("#eventSwitch");
+      const newsSwitch = modal.querySelector("#newsSwitch");
+      const saveBtn = modal.querySelector("#saveSettingsBtn");
+
+      liveSwitch.checked = userPreferences.Live;
+      eventSwitch.checked = userPreferences.Événement;
+      newsSwitch.checked = userPreferences.News;
+
+      liveSwitch.addEventListener("change", () => {
+        userPreferences.Live = liveSwitch.checked;
+        savePreferences();
+      });
+      eventSwitch.addEventListener("change", () => {
+        userPreferences.Événement = eventSwitch.checked;
+        savePreferences();
+      });
+      newsSwitch.addEventListener("change", () => {
+        userPreferences.News = newsSwitch.checked;
+        savePreferences();
+      });
+
+      saveBtn.addEventListener("click", () => {
+        savePreferences();
+        modal.remove();
+        alert("Préférences sauvegardées avec succès !");
+      });
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.remove();
+      });
+    }
+
+    // Écouteurs pour les boutons avec chargement asynchrone
+    document.getElementById("notification-btn").addEventListener("click", async () => {
+      await showNotificationSettingsModal();
+    });
+    document.getElementById("send-notification-btn")?.addEventListener("click", showNotificationModal);
+    
         // Profile button listener (single listener to avoid conflicts)
         document.getElementById("user-btn").addEventListener("click", () => {
           console.log("user-btn clicked, currentUser:", currentUser, "userRole:", userRole); // Debug click
@@ -1974,22 +2225,6 @@ if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
               errorDiv.classList.remove("hidden");
             }
           });
-        });
-
-        // Gestion des notifications (exemple basique)
-        const notificationBtn = document.getElementById("notification-btn");
-        notificationBtn.addEventListener("click", () => {
-          const notificationModal = document.createElement("div");
-          notificationModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-          notificationModal.innerHTML = `
-            <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
-              <h4 class="font-bold text-md mb-4">Notifications</h4>
-              <p class="text-gray-600 mb-4">Aucune nouvelle notification pour le moment.</p>
-              <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
-            </div>
-          `;
-          document.body.appendChild(notificationModal);
-          notificationModal.querySelector("button").onclick = () => notificationModal.remove();
         });
 
         // Gestion des erreurs globales
