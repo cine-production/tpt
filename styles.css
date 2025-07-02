@@ -91,6 +91,10 @@ a {
   z-index: var(--z-fixed);
 }
 
+.nav__list svg {
+  width: 20px;
+}
+
 .nav__list {
   display: flex;
   justify-content: space-between;
@@ -100,11 +104,51 @@ a {
 .nav__link {
   color: var(--text-color);
   font-size: 1.5rem;
-  transition: color .4s;
+  transition: all .2s ease-in-out;
 }
 
 .nav__link:hover {
   color: var(--white-color);
+}
+
+.active-tab {
+    display: flex
+;
+    scale: 1.6;
+    background: #505050;
+    border-radius: 50%;
+    height: 25px;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    width: 25px;
+    /* top: 19px; */
+    transition: all .2s ease-in-out !important;
+        position: relative;
+}
+.active-tab i {
+  scale: 0.7;
+  transition: all .2s ease-in-out !important;
+}
+.active-tab svg {
+    display: flex
+;
+    scale: 1.6;
+    background: #505050;
+    border-radius: 50%;
+    height: 25px;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    width: 25px;
+    /* top: 19px; */
+    transition: all .2s ease-in-out !important;
+        position: relative;
+}
+.active-tab svg {
+  scale: 0.6;
+  transition: all .2s ease-in-out !important;
+  border-radius: 0;
 }
 
 /*=============== EXPAND LIST ===============*/
@@ -202,7 +246,9 @@ a {
 /* Active link */
 .active-link {
   color: var(--white-color);
+  fill: var(--white-color);
 }
+
 
 .nav__list .text-primary {
   color: var(--white-color) !important;
