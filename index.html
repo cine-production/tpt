@@ -149,15 +149,72 @@
   left: 2px;
   transition: transform 0.3s;
 }
+.page-content {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.transform {
+  transform: translateX(0);
+}
+.transition-transform {
+  transition: transform 0.3s ease-in-out;
+}
+.translate-x-full {
+  transform: translateX(100%);
+}
+.bg-opacity-80 {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px); /* Ajustez la valeur si besoin */
+}
+.page-content {
+  position: relative;
+  height: calc(100vh - 120px); /* Ajuster pour les navbars fixes */
+  /* overflow-y: auto; */
+}
+/* Style pour la page latérale */
+#toilets-detail-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.5s ease-in-out;
+  z-index: 49;
+  padding: 80px 20px 100px;
+  overflow-y: auto;
+}
+
+#toilets-detail-page.active {
+  transform: translateX(0);
+}
+
+nav.nav {
+  z-index: 50;
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+nav.top-nav {
+  z-index: 50;
+}
     </style>
   </head>
   <body class="bg-gray-50">
     <!-- Navigation supérieure -->
-    <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+    <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 top-nav">
       <div class="flex items-center justify-between px-4 py-3">
         <h1 class="text-2xl font-['Pacifico'] text-primary">logo</h1>
         <div class="flex items-center space-x-3">
-          <button id="notification-btn"
+          <button id="notification-btn" style="display: none;"
             class="w-8 h-8 flex items-center justify-center text-gray-600">
             <i class="ri-notification-3-line ri-lg"></i>
           </button>
@@ -321,6 +378,15 @@
         </button> -->
       </div>
 
+      <!-- Page Toilettes -->
+      <div id="toilets-page" class="page-content hidden">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Toilettes des Parcs
+          Disney</h2>
+        <div id="park-toilets" class="space-y-4">
+          <!-- Blocs pour chaque parc seront générés dynamiquement -->
+        </div>
+      </div>
+
       <!-- Page Plus (Réseaux sociaux) -->
       <div id="more-page" class="page-content hidden">
         <h2 class="text-xl font-bold text-gray-800 mb-6">Nos Réseaux
@@ -399,8 +465,17 @@
           </a>
         </li>
 
-        <!-- Expand list -->
         <li>
+          <a href="#toilets" class="nav__link nav-item"
+            data-page="toilets-page">
+            <svg class="ri-restroom-fill" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"><path
+                d="M0 24C0 37.3 10.7 48 24 48l32 0 336 0 32 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L392 0 56 0 24 0C10.7 0 0 10.7 0 24zM81.6 182.9l-1.6 .5L80 80 32 80l0 127.1-.4 .4C17.5 219.4 8 235.7 8 256c0 72.7 33.4 120.2 78.4 148.3c1.7 1.1 3.5 2.1 5.2 3.2L69.3 448.2c-3.5 6.3-5.3 13.5-5.3 20.7c0 23.8 19.3 43.1 43.1 43.1l233.8 0c23.8 0 43.1-19.3 43.1-43.1c0-7.2-1.8-14.4-5.3-20.7l-22.3-40.7c1.8-1 3.5-2.1 5.2-3.2c45-28.1 78.4-75.6 78.4-148.3c0-20.3-9.5-36.6-23.6-48.5l-.4-.4L416 80l-48 0 0 103.4-1.6-.5C328.4 172 277.7 168 224 168s-104.4 4-142.4 14.9zM373.8 326.8c-9.8 15.7-22.9 27.6-37.6 36.9C303 384.4 259.9 392 224 392s-79-7.6-112.2-28.3c-14.7-9.2-27.8-21.2-37.6-36.9c2.4 .8 4.9 1.5 7.4 2.3C119.6 340 170.3 344 224 344s104.4-4 142.4-14.9c2.5-.7 4.9-1.5 7.4-2.3zM56 256c0-3.7 1.2-7.4 6.6-12c6.1-5.1 16.5-10.4 32.3-15C126.3 220 171.6 216 224 216s97.7 4 129.1 13.1c15.8 4.5 26.2 9.8 32.2 15c5.4 4.6 6.6 8.2 6.6 12s-1.2 7.4-6.6 12c-6.1 5.1-16.5 10.4-32.2 15C321.7 292 276.4 296 224 296s-97.7-4-129.1-13.1c-15.8-4.5-26.2-9.8-32.3-15c-5.4-4.6-6.6-8.2-6.6-12zM312.3 426.8L332.6 464l-217.3 0 20.4-37.2c30.5 9.7 61.8 13.2 88.3 13.2s57.7-3.5 88.3-13.2zM128 80c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-48 0z" /></svg>
+          </a>
+        </li>
+
+        <!-- Expand list -->
+        <li class="nav-expand-pri">
           <button class="hidden BtnAddAll nav__expand" id="nav-expand">
             <i class="ri-add-line nav__expand-icon" id="nav-expand-icon"></i>
           </button>
@@ -438,17 +513,33 @@
                 </a>
               </li>
             </button>
-            <button id="send-notification-btn">
+            <button id="add-ratingToilete-btn">
+              <li>
+                <a class="nav__expand-link">
+                  <i class="ri-star-line"></i>
+                  <span>Toilettes</span>
+                </a>
+              </li>
+            </button>
+            <!-- <button id="send-notification-btn">
         <li>
           <a class="nav__expand-link">
             <i class="ri-notification-3-line"></i>
             <span>Notif</span>
           </a>
         </li>
-      </button>
+      </button> -->
           </ul>
         </li>
 
+        <li>
+          <a href="#toilets" class="nav__link nav-item"
+            data-page="toilets-page">
+            <svg class="ri-restroom-fill" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"><path
+                d="M0 24C0 37.3 10.7 48 24 48l32 0 336 0 32 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L392 0 56 0 24 0C10.7 0 0 10.7 0 24zM81.6 182.9l-1.6 .5L80 80 32 80l0 127.1-.4 .4C17.5 219.4 8 235.7 8 256c0 72.7 33.4 120.2 78.4 148.3c1.7 1.1 3.5 2.1 5.2 3.2L69.3 448.2c-3.5 6.3-5.3 13.5-5.3 20.7c0 23.8 19.3 43.1 43.1 43.1l233.8 0c23.8 0 43.1-19.3 43.1-43.1c0-7.2-1.8-14.4-5.3-20.7l-22.3-40.7c1.8-1 3.5-2.1 5.2-3.2c45-28.1 78.4-75.6 78.4-148.3c0-20.3-9.5-36.6-23.6-48.5l-.4-.4L416 80l-48 0 0 103.4-1.6-.5C328.4 172 277.7 168 224 168s-104.4 4-142.4 14.9zM373.8 326.8c-9.8 15.7-22.9 27.6-37.6 36.9C303 384.4 259.9 392 224 392s-79-7.6-112.2-28.3c-14.7-9.2-27.8-21.2-37.6-36.9c2.4 .8 4.9 1.5 7.4 2.3C119.6 340 170.3 344 224 344s104.4-4 142.4-14.9c2.5-.7 4.9-1.5 7.4-2.3zM56 256c0-3.7 1.2-7.4 6.6-12c6.1-5.1 16.5-10.4 32.3-15C126.3 220 171.6 216 224 216s97.7 4 129.1 13.1c15.8 4.5 26.2 9.8 32.2 15c5.4 4.6 6.6 8.2 6.6 12s-1.2 7.4-6.6 12c-6.1 5.1-16.5 10.4-32.2 15C321.7 292 276.4 296 224 296s-97.7-4-129.1-13.1c-15.8-4.5-26.2-9.8-32.3-15c-5.4-4.6-6.6-8.2-6.6-12zM312.3 426.8L332.6 464l-217.3 0 20.4-37.2c30.5 9.7 61.8 13.2 88.3 13.2s57.7-3.5 88.3-13.2zM128 80c-8.8 0-16 7.2-16 16s7.2 16 16 16l48 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-48 0z" /></svg>
+          </a>
+        </li>
         <li>
           <a href="#ratings" class="nav__link nav-item"
             data-page="ratings-page">
@@ -493,365 +584,514 @@
         userBtn.disabled = true; // Disable button until auth state is resolved
 
         // Authentication state observer
-        onAuthStateChanged(auth, async user => {
-          currentUser = user;
-          userRole = null;
-          if (user) {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            // Mettre à jour l'icône utilisateur avec l'avatar
-if (user && userDocSnap.exists() && userDocSnap.data().avatar) {
-  userBtn.innerHTML = `
-    <img src="${userDocSnap.data().avatar}" class="w-8 h-8 rounded-full object-cover" alt="Avatar utilisateur">
-  `;
-  currentUser.avatar = userDocSnap.data().avatar; // Stocker l'avatar pour le modal de profil
-  userRole = userDocSnap.data().role;
-} else {
-  userBtn.innerHTML = `<i class="ri-user-line ri-lg"></i>`;
-  userRole = userDocSnap.data().role;
-}
-          }
-          console.log("Auth state updated, currentUser:", currentUser, "userRole:", userRole); // Debug auth state
-          userBtn.disabled = false; // Enable button after auth state is resolved
-          const isAdmin = userRole === "admin";
-          document.getElementById("add-event-btn").classList.toggle("hidden", !isAdmin);
-          document.getElementById("add-rating-btn").classList.toggle("hidden", !isAdmin);
-          document.getElementById("add-news-btn").classList.toggle("hidden", !isAdmin);
-          document.getElementById("set-live-admin-container").classList.toggle("hidden", !isAdmin);
-          document.querySelectorAll(".BtnAddAll").forEach(element => {element.classList.toggle("hidden", !isAdmin);});
-          loadHomePage();
-          loadRatings();
-
-          
-
-// Fonction utilitaire pour convertir la clé VAPID
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-        });
-
-        const notificationTokens = {
-      Live: "Asv8QMoGjRLvnt5",
-      Événement: "ASDxBoLF6kzaXJu",
-      News: "A0.9MnCeCmWk45I"
-    };
-
-    // Initialiser et charger les préférences depuis Firestore
-    let userPreferences = { Live: false, Événement: false, News: false };
-    async function loadPreferences() {
-      if (currentUser) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            userPreferences = { ...userPreferences, ...data.notificationPrefs };
-          }
-          console.log("Préférences chargées:", userPreferences);
-        } catch (error) {
-          console.error("Erreur lors du chargement des préférences:", error);
-        }
-      }
-      return userPreferences;
+        // Remplacez la section existante de onAuthStateChanged par ceci
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  userRole = null;
+  if (user) {
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists() && userDocSnap.data().avatar) {
+      userBtn.innerHTML = `
+        <img src="${userDocSnap.data().avatar}" class="w-8 h-8 rounded-full object-cover" alt="Avatar utilisateur">
+      `;
+      currentUser.avatar = userDocSnap.data().avatar;
+      userRole = userDocSnap.data().role;
+    } else {
+      userBtn.innerHTML = `<i class="ri-user-line ri-lg"></i>`;
+      userRole = userDocSnap.data()?.role || "user";
     }
+    // Sauvegarder l'état de connexion localement
+    localStorage.setItem("userId", user.uid);
+  } else {
+    userBtn.innerHTML = `<i class="ri-user-line ri-lg"></i>`;
+    userBtn.disabled = false;
+    localStorage.removeItem("userId");
+    // Revenir à la page d'accueil si déconnecté
+    showPage("home-page");
+  }
+  console.log("Auth state updated, currentUser:", currentUser, "userRole:", userRole);
+  userBtn.disabled = false;
+  const isAdmin = userRole === "admin";
+  document.getElementById("add-event-btn").classList.toggle("hidden", !isAdmin);
+  document.getElementById("add-rating-btn").classList.toggle("hidden", !isAdmin);
+  document.getElementById("add-news-btn").classList.toggle("hidden", !isAdmin);
+  document.getElementById("set-live-admin-container").classList.toggle("hidden", !isAdmin);
+  document.querySelectorAll(".BtnAddAll").forEach(element => element.classList.toggle("hidden", !isAdmin));
+  document.querySelectorAll(".nav-expand-pri").forEach(element => element.classList.toggle("hidden", !isAdmin));
+  loadHomePage();
+  loadRatings();
+  loadCalendar(); // Recharger le calendrier pour refléter l'état d'authentification
+});
 
+    // Mapping des types de notifications aux tokens
+    const notificationTopics = {
+  Live: "live_topic",
+  Événement: "event_topic",
+  News: "news_topic"
+};
 
-
-    // ... (code existant jusqu'à la fin de onAuthStateChanged)
-
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-  let registration;
-  navigator.serviceWorker.register('/sw.js')
-    .then(reg => {
-      registration = reg;
-      console.log('Service Worker enregistré avec succès:', registration);
-      return reg.pushManager.getSubscription();
-    })
-    .then(subscription => {
-      if (!subscription) {
-        // Inscription au push si pas encore fait
-        const vapidPublicKey = 'BPDjj65QpMK9iFxwComOpSQdt7ICAk70Gm6Y8xMo-XafUeby-Mq6S4p3Yuc3sW1mmvS2dKQ4yNDfx1eOTpvMTaQ'; // Remplacez par votre clé VAPID publique de Gotify
-        const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-        return registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertedVapidKey
-        });
+// Initialiser et charger les préférences depuis Firestore
+let userPreferences = { Live: false, Événement: false, News: false };
+async function loadPreferences() {
+  if (currentUser) {
+    try {
+      const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        userPreferences = { ...userPreferences, ...data.notificationPrefs };
       }
-      return subscription;
-    })
-    .then(subscription => {
-      console.log('Abonnement Push:', subscription);
-      // Envoyer l'abonnement à Gotify ou Firebase (nécessite une API personnalisée)
-      if (currentUser) {
-        setDoc(doc(db, "users", currentUser.uid), { pushSubscription: subscription.toJSON() }, { merge: true })
-          .then(() => console.log("Abonnement Push sauvegardé dans Firestore"))
-          .catch(error => console.error("Erreur sauvegarde abonnement:", error));
-      }
-    })
-    .catch(error => {
-      console.error('Erreur d\'inscription Push:', error);
+      console.log("Préférences chargées:", userPreferences);
+      await syncPreferencesWithSW();
+    } catch (error) {
+      console.error("Erreur lors du chargement des préférences:", error);
+    }
+  }
+  return userPreferences;
+}
+
+// Fonction pour sauvegarder les préférences dans Firestore
+async function savePreferences() {
+  if (currentUser) {
+    try {
+      await setDoc(doc(db, "users", currentUser.uid), { notificationPrefs: userPreferences }, { merge: true });
+      console.log("Préférences sauvegardées:", userPreferences);
+      await syncPreferencesWithSW();
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde des préférences:", error);
+    }
+  }
+}
+
+// Fonction pour synchroniser les préférences avec le Service Worker
+async function syncPreferencesWithSW() {
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.ready;
+    registration.active.postMessage({
+      type: 'updatePreferences',
+      preferences: userPreferences
     });
-}
-
-// Fonction utilitaire pour convertir la clé VAPID
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
+    console.log('Préférences synchronisées avec Service Worker:', userPreferences);
   }
-  return outputArray;
 }
 
-// ... (reste du code existant après loadRatings)
-
-
-
-    // Fonction pour sauvegarder les préférences dans Firestore
-    async function savePreferences() {
-      if (currentUser) {
-        try {
-          await setDoc(doc(db, "users", currentUser.uid), { notificationPrefs: userPreferences }, { merge: true });
-          console.log("Préférences sauvegardées:", userPreferences);
-        } catch (error) {
-          console.error("Erreur lors de la sauvegarde des préférences:", error);
-        }
+// Fonction pour demander l'autorisation des notifications
+function requestNotificationPermission(type) {
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        console.log(`Autorisation accordée pour les notifications de type ${type}`);
+        userPreferences[type] = true;
+        savePreferences();
+      } else {
+        console.log(`Autorisation refusée pour les notifications de type ${type}`);
       }
-    }
+    });
+  } else if (Notification.permission === 'granted') {
+    userPreferences[type] = true;
+    savePreferences();
+  }
+}
 
-    // Fonction pour envoyer une notification via Gotify avec débogage
-    async function sendNotification(title, message, priority, token) {
-  const url = `http://furcity.duckdns.org:8183/message?token=${token}`;
-  console.log(`Tentative d'envoi à ${url} avec token ${token}, titre: ${title}, message: ${message}, priorité: ${priority}`);
+document.querySelectorAll('[data-park-id]').forEach(item => {
+  item.addEventListener('click', () => showToiletDetails(item.getAttribute('data-park-id')));
+});
+
+document.querySelector('[data-page="toilets-page"]').addEventListener("click", loadToiletsPage);
+
+async function loadToiletsPage() {
+  const parkToilets = document.getElementById("park-toilets");
+  if (!parkToilets) {
+    console.error("Élément park-toilets non trouvé dans le DOM");
+    return;
+  }
+  parkToilets.innerHTML = '<p class="text-gray-600">Chargement...</p>';
+
+  try {
+    const parks = [
+      { id: "disneyland-paris", name: "Disneyland Paris", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Disneyland_Resort_logo.svg/1200px-Disneyland_Resort_logo.svg.png" },
+      { id: "epcot", name: "EPCOT", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Disneyland_Resort_logo.svg/1200px-Disneyland_Resort_logo.svg.png" },
+    ];
+
+    parkToilets.innerHTML = '';
+
+    parks.forEach(park => {
+      const parkElement = document.createElement("div");
+      parkElement.className = "bg-white rounded-md p-4 shadow-sm flex justify-between items-center cursor-pointer group";
+      parkElement.setAttribute("data-park-id", park.id);
+      parkElement.innerHTML = `
+        <div class="flex items-center space-x-3">
+          ${park.logo ? `<img src="${park.logo}" alt="${park.name} Logo" class="w-10 h-10 object-contain">` : ''}
+          <span class="text-gray-800 font-medium">${park.name}</span>
+        </div>
+        <i class="ri-arrow-right-s-line text-gray-500"></i>
+      `;
+      parkToilets.appendChild(parkElement);
+    });
+
+    // Ajouter les écouteurs après avoir créé les éléments
+    const parkElements = document.querySelectorAll('[data-park-id]');
+    parkElements.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log("Clic détecté sur :", item.getAttribute('data-park-id')); // Débogage
+        showToiletDetails(item.getAttribute('data-park-id'));
+      });
+    });
+    console.log("Écouteurs attachés à :", parkElements.length, "éléments");
+  } catch (error) {
+    console.error("Erreur lors du chargement des toilettes :", error);
+    parkToilets.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
+  }
+}
+
+// Fonction séparée pour attacher les écouteurs
+function attachParkListeners() {
+  document.querySelectorAll('[data-park-id]').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log("Clic détecté sur :", item.getAttribute('data-park-id'));
+      showToiletDetails(item.getAttribute('data-park-id'));
+    });
+  });
+}
+
+  function showToiletDetails(parkId) {
+  let detailPage = document.getElementById("toilets-detail-page");
+  if (!detailPage) {
+    detailPage = document.createElement("div");
+    detailPage.id = "toilets-detail-page";
+    detailPage.className = "toilets-detail-page"; // Appliquer une classe pour les styles CSS
+    document.body.appendChild(detailPage);
+    console.log("Nouveau élément créé :", detailPage);
+  } else {
+    // Réinitialiser l'élément existant
+    detailPage.classList.remove("active");
+    detailPage.innerHTML = ""; // Vider le contenu
+    console.log("Élément existant réinitialisé :", detailPage);
+  }
+
+  const toiletPosts = {
+    "disneyland-paris": [
+      { id: 1, location: "Disneyland Park - Near Sleeping Beauty Castle", text: "Très propres et bien entretenues !", date: "2025-06-29" },
+      { id: 2, location: "Disneyland Park - Main Street", text: "Longue file d'attente aujourd'hui.", date: "2025-06-28" },
+      { id: 3, location: "Disney Studios - Near Tower of Terror", text: "Propre et accessible.", date: "2025-06-27" },
+      { id: 4, location: "Disney Studios - Animation Courtyard", text: "Un peu encombré en ce moment.", date: "2025-06-26" },
+      { id: 5, location: "Disney Studios - Backlot", text: "Calme et propre.", date: "2025-06-25" },
+      { id: 6, location: "Disneyland Park - Adventureland", text: "Assez fréquenté.", date: "2025-06-24" }
+    ],
+    "epcot": [
+      { id: 1, location: "Disneyland Park - Near Sleeping Beauty Castle", text: "Très propres et bien entretenues !", date: "2025-06-29" },
+      { id: 2, location: "Disneyland Park - Main Street", text: "Longue file d'attente aujourd'hui.", date: "2025-06-28" }
+    ]
+  };
+
+  const posts = toiletPosts[parkId] || [];
+  detailPage.innerHTML = `
+    <button class="top-4 left-4 px-4 py-2 bg-gray-200 text-gray-800 rounded-button" onclick="document.getElementById('toilets-detail-page').classList.remove('active'); document.body.classList.remove('no-scroll')">Retour</button>
+    <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8 text-center">Toilettes - ${parkId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+    <div class="px-4">
+      ${posts.length > 0 ? posts.map(post => `
+        <div class="bg-white rounded-md p-4 shadow-sm mb-4">
+          <p class="text-gray-700"><strong>${post.location}</strong></p>
+          <p class="text-gray-700 mt-1">${post.text}</p>
+          <p class="text-sm text-gray-500 mt-2">${new Date(post.date).toLocaleDateString('fr-FR')}</p>
+        </div>
+      `).join('') : '<p class="text-gray-600 text-center">Aucune publication disponible.</p>'}
+    </div>
+  `;
+
+  // Forcer un reflow avant d'ajouter la classe active
+  detailPage.offsetHeight;
+  setTimeout(() => {
+    detailPage.classList.add("active");
+    document.body.classList.add("no-scroll");
+    console.log("Classe active ajoutée, élément :", detailPage);
+  }, 50);
+
+  console.log("Détails affichés pour :", parkId);
+}
+
+
+
+
+// Fonction pour envoyer une notification via ntfy.sh avec topic
+async function sendNotification(title, message, priority, type, topic) {
+  const url = `https://ntfy.sh/${topic}`;
+  console.log(`Tentative d'envoi à ${url}, titre: ${title}, message: ${message}, priorité: ${priority}, type: ${type}`);
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, message, priority })
+      headers: { 
+        "Content-Type": "text/plain",
+        "Priority": priority // ntfy.sh accepte les priorités via en-tête (1-5)
+      },
+      body: message
     });
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-    }
-    const result = await response.json();
-    console.log("Notification envoyée avec succès:", result);
-    return result;
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    console.log("Notification envoyée avec succès");
+    return response;
   } catch (error) {
-    console.error(`Erreur pour le token ${token}:`, error.message);
+    console.error(`Erreur pour le topic ${topic}:`, error.message);
     throw error;
   }
 }
 
-    // Fonction pour afficher le modal de notification
-    function showNotificationModal() {
-      if (!currentUser || userRole !== "admin") {
-        alert("Vous devez être administrateur pour envoyer des notifications");
-        return;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.type === 'newNotification') {
+      const { topic, message } = event.data;
+      let type = '';
+      if (topic === 'live_topic') type = 'Live';
+      if (topic === 'event_topic') type = 'Événement';
+      if (topic === 'news_topic') type = 'News';
+
+      if (userPreferences[type]) {
+        alert(`Nouvelle notification (${type}): ${message}`);
+        // Vous pouvez aussi ajouter un élément DOM pour une interface plus élégante
+        const notificationDiv = document.createElement('div');
+        notificationDiv.textContent = `(${type}) ${message}`;
+        notificationDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #fff; padding: 10px; border: 1px solid #ccc; z-index: 1000;';
+        document.body.appendChild(notificationDiv);
+        setTimeout(() => notificationDiv.remove(), 5000); // Supprime après 5 secondes
       }
-
-      const modal = document.createElement("div");
-      modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-      modal.innerHTML = `
-        <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
-          <form id="notificationForm" class="space-y-4">
-            <h3 class="text-md font-semibold text-gray-800 mb-4">Envoyer une notification</h3>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-              <input type="text" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-              <textarea name="body" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Priorité (1-5)</label>
-              <input type="number" name="priority" min="1" max="5" value="5" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Type(s) de notification</label>
-              <select name="types" multiple required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary h-24">
-                <option value="Live">Live</option>
-                <option value="Événement">Événement</option>
-                <option value="News">News</option>
-              </select>
-            </div>
-            <div id="notification-error" class="text-red-500 text-sm hidden"></div>
-            <div class="flex space-x-3 pt-4">
-              <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelNotificationBtn">Annuler</button>
-              <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Envoyer</button>
-            </div>
-          </form>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      const form = modal.querySelector("#notificationForm");
-      const cancelBtn = modal.querySelector("#cancelNotificationBtn");
-      const errorDiv = modal.querySelector("#notification-error");
-
-      cancelBtn.onclick = () => modal.remove();
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        const priority = parseInt(data.priority);
-        const selectedTypes = form.querySelector("select[name=types]").selectedOptions;
-
-        try {
-          const promises = [];
-          for (let option of selectedTypes) {
-            const type = option.value;
-            const token = notificationTokens[type];
-            if (userPreferences[type]) { // Vérifie si la notification est activée pour ce type
-              promises.push(sendNotification(data.title, data.body, priority, token));
-            }
-          }
-          await Promise.all(promises);
-          modal.remove();
-          const successModal = document.createElement("div");
-          successModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-          successModal.innerHTML = `
-            <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
-              <div class="text-center">
-                <div class="w-12 h-12 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
-                  <i class="ri-check-line text-green-500 text-2xl"></i>
-                </div>
-                <h4 class="text-md font-semibold text-gray-800 mb-2">Notification(s) envoyée(s)</h4>
-                <p class="text-gray-600 mb-4">Les notifications ont été envoyées avec succès.</p>
-                <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
-              </div>
-            </div>
-          `;
-          document.body.appendChild(successModal);
-          successModal.querySelector("button").onclick = () => successModal.remove();
-        } catch (error) {
-          console.error("Erreur lors de l'envoi:", error);
-          errorDiv.textContent = `Erreur : ${error.message}`;
-          errorDiv.classList.remove("hidden");
-        }
-      });
     }
+  });
+}
 
-    // Modal pour activer/désactiver les notifications avec switches stylisés
-    async function showNotificationSettingsModal() {
-      await loadPreferences();
+// Fonction pour afficher le modal de notification
+function showNotificationModal() {
+  if (!currentUser || userRole !== "admin") {
+    alert("Vous devez être administrateur pour envoyer des notifications");
+    return;
+  }
 
-      const modal = document.createElement("div");
-      modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-      modal.innerHTML = `
-        <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
-          <h3 class="text-md font-semibold text-gray-800 mb-4">Paramètres des notifications</h3>
-          <div class="space-y-4">
-            <label class="flex items-center space-x-3">
-              <input type="checkbox" id="liveSwitch" class="toggle-switch" ${userPreferences.Live ? "checked" : ""}>
-              <span class="text-sm font-medium text-gray-700">Live</span>
-            </label>
-            <label class="flex items-center space-x-3">
-              <input type="checkbox" id="eventSwitch" class="toggle-switch" ${userPreferences.Événement ? "checked" : ""}>
-              <span class="text-sm font-medium text-gray-700">Événement</span>
-            </label>
-            <label class="flex items-center space-x-3">
-              <input type="checkbox" id="newsSwitch" class="toggle-switch" ${userPreferences.News ? "checked" : ""}>
-              <span class="text-sm font-medium text-gray-700">News</span>
-            </label>
-          </div>
-          <div class="flex justify-end pt-4">
-            <button id="saveSettingsBtn" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Sauvegarder</button>
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+      <form id="notificationForm" class="space-y-4">
+        <h3 class="text-md font-semibold text-gray-800 mb-4">Envoyer une notification</h3>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+          <input type="text" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+          <textarea name="body" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Priorité (1-5)</label>
+          <input type="number" name="priority" min="1" max="5" value="5" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Type(s) de notification</label>
+          <select name="types" multiple required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary h-24">
+            <option value="Live">Live</option>
+            <option value="Événement">Événement</option>
+            <option value="News">News</option>
+          </select>
+        </div>
+        <div id="notification-error" class="text-red-500 text-sm hidden"></div>
+        <div class="flex space-x-3 pt-4">
+          <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelNotificationBtn">Annuler</button>
+          <button type="button" class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-button hover:bg-yellow-600" id="requestPermissionBtn">Demander Autorisation</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Envoyer</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const form = modal.querySelector("#notificationForm");
+  const cancelBtn = modal.querySelector("#cancelNotificationBtn");
+  const requestPermissionBtn = modal.querySelector("#requestPermissionBtn");
+  const errorDiv = modal.querySelector("#notification-error");
+
+  cancelBtn.onclick = () => modal.remove();
+
+  requestPermissionBtn.onclick = () => {
+    const selectedTypes = form.querySelector("select[name=types]").selectedOptions;
+    for (let option of selectedTypes) {
+      requestNotificationPermission(option.value);
+    }
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    const priority = parseInt(data.priority);
+    const selectedTypes = form.querySelector("select[name=types]").selectedOptions;
+
+    try {
+      const promises = [];
+      for (let option of selectedTypes) {
+        const type = option.value;
+        const topic = notificationTopics[type];
+        promises.push(sendNotification(data.title, data.body, priority, type, topic));
+      }
+      await Promise.all(promises);
+      modal.remove();
+      const successModal = document.createElement("div");
+      successModal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+      successModal.innerHTML = `
+        <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+          <div class="text-center">
+            <div class="w-12 h-12 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
+              <i class="ri-check-line text-green-500 text-2xl"></i>
+            </div>
+            <h4 class="text-md font-semibold text-gray-800 mb-2">Notification(s) envoyée(s)</h4>
+            <p class="text-gray-600 mb-4">Les notifications ont été envoyées avec succès.</p>
+            <button class="w-full bg-primary text-white py-2 rounded-button">Fermer</button>
           </div>
         </div>
       `;
-      document.body.appendChild(modal);
-
-      const style = document.createElement("style");
-      style.textContent = `
-        .toggle-switch {
-          width: 50px;
-          height: 24px;
-          position: relative;
-          appearance: none;
-          background: #e5e7eb;
-          border-radius: 12px;
-          outline: none;
-          cursor: pointer;
-          transition: background 0.3s;
-        }
-        .toggle-switch:checked {
-          background: #10b981;
-        }
-        .toggle-switch::before {
-          content: '';
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          top: 2px;
-          left: 2px;
-          background: white;
-          border-radius: 50%;
-          transition: transform 0.3s;
-        }
-        .toggle-switch:checked::before {
-          transform: translateX(26px);
-        }
-      `;
-      document.head.appendChild(style);
-
-      const liveSwitch = modal.querySelector("#liveSwitch");
-      const eventSwitch = modal.querySelector("#eventSwitch");
-      const newsSwitch = modal.querySelector("#newsSwitch");
-      const saveBtn = modal.querySelector("#saveSettingsBtn");
-
-      liveSwitch.checked = userPreferences.Live;
-      eventSwitch.checked = userPreferences.Événement;
-      newsSwitch.checked = userPreferences.News;
-
-      liveSwitch.addEventListener("change", () => {
-        userPreferences.Live = liveSwitch.checked;
-        savePreferences();
-      });
-      eventSwitch.addEventListener("change", () => {
-        userPreferences.Événement = eventSwitch.checked;
-        savePreferences();
-      });
-      newsSwitch.addEventListener("change", () => {
-        userPreferences.News = newsSwitch.checked;
-        savePreferences();
-      });
-
-      saveBtn.addEventListener("click", () => {
-        savePreferences();
-        modal.remove();
-        alert("Préférences sauvegardées avec succès !");
-      });
-
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) modal.remove();
-      });
+      document.body.appendChild(successModal);
+      successModal.querySelector("button").onclick = () => successModal.remove();
+    } catch (error) {
+      console.error("Erreur lors de l'envoi:", error);
+      errorDiv.textContent = `Erreur : ${error.message}`;
+      errorDiv.classList.remove("hidden");
     }
+  });
+}
 
-    // Écouteurs pour les boutons avec chargement asynchrone
-    document.getElementById("notification-btn").addEventListener("click", async () => {
-      await showNotificationSettingsModal();
-    });
-    document.getElementById("send-notification-btn")?.addEventListener("click", showNotificationModal);
-    
-        // Profile button listener (single listener to avoid conflicts)
-        document.getElementById("user-btn").addEventListener("click", () => {
-          console.log("user-btn clicked, currentUser:", currentUser, "userRole:", userRole); // Debug click
-          if (currentUser) {
-            showProfileModal();
-          } else {
-            showLoginModal("login");
-          }
-        });
+// Modal pour activer/désactiver les notifications avec switches stylisés
+async function showNotificationSettingsModal() {
+  await loadPreferences();
+
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+      <h3 class="text-md font-semibold text-gray-800 mb-4">Paramètres des notifications</h3>
+      <div class="space-y-4">
+        <label class="flex items-center space-x-3">
+          <input type="checkbox" id="liveSwitch" class="toggle-switch" ${userPreferences.Live ? "checked" : ""}>
+          <span class="text-sm font-medium text-gray-700">Live</span>
+        </label>
+        <label class="flex items-center space-x-3">
+          <input type="checkbox" id="eventSwitch" class="toggle-switch" ${userPreferences.Événement ? "checked" : ""}>
+          <span class="text-sm font-medium text-gray-700">Événement</span>
+        </label>
+        <label class="flex items-center space-x-3">
+          <input type="checkbox" id="newsSwitch" class="toggle-switch" ${userPreferences.News ? "checked" : ""}>
+          <span class="text-sm font-medium text-gray-700">News</span>
+        </label>
+      </div>
+      <div class="flex justify-end pt-4">
+        <button id="saveSettingsBtn" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Sauvegarder</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .toggle-switch {
+      width: 50px;
+      height: 24px;
+      position: relative;
+      appearance: none;
+      background: #e5e7eb;
+      border-radius: 12px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .toggle-switch:checked {
+      background: #10b981;
+    }
+    .toggle-switch::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 2px;
+      left: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    .toggle-switch:checked::before {
+      transform: translateX(26px);
+    }
+  `;
+  document.head.appendChild(style);
+
+  const liveSwitch = modal.querySelector("#liveSwitch");
+  const eventSwitch = modal.querySelector("#eventSwitch");
+  const newsSwitch = modal.querySelector("#newsSwitch");
+  const saveBtn = modal.querySelector("#saveSettingsBtn");
+
+  liveSwitch.checked = userPreferences.Live;
+  eventSwitch.checked = userPreferences.Événement;
+  newsSwitch.checked = userPreferences.News;
+
+  liveSwitch.addEventListener("change", () => {
+    userPreferences.Live = liveSwitch.checked;
+    savePreferences();
+  });
+  eventSwitch.addEventListener("change", () => {
+    userPreferences.Événement = eventSwitch.checked;
+    savePreferences();
+  });
+  newsSwitch.addEventListener("change", () => {
+    userPreferences.News = newsSwitch.checked;
+    savePreferences();
+  });
+
+  saveBtn.addEventListener("click", () => {
+    savePreferences();
+    modal.remove();
+    alert("Préférences sauvegardées avec succès !");
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.remove();
+  });
+}
+
+// Écouteurs pour les boutons avec chargement asynchrone
+document.getElementById("notification-btn").addEventListener("click", async () => {
+  await showNotificationSettingsModal();
+});
+document.getElementById("send-notification-btn")?.addEventListener("click", showNotificationModal);
+
+// Initialisation du Service Worker et réception des notifications
+// if ('serviceWorker' in navigator) {
+//   navigator.serviceWorker.register('/sw.js')
+//     .then(reg => {
+//       console.log('Service Worker enregistré avec succès:', reg.scope);
+//       return loadPreferences().then(() => syncPreferencesWithSW());
+//     })
+//     .catch(error => {
+//       console.error('Erreur d\'inscription Service Worker:', error);
+//     });
+// }
+
+// Fonction utilitaire (non utilisée avec ntfy.sh)
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+// Profile button listener (single listener to avoid conflicts)
+document.getElementById("user-btn").addEventListener("click", () => {
+  console.log("user-btn clicked, currentUser:", currentUser, "userRole:", userRole); // Debug click
+  if (currentUser) {
+    showProfileModal();
+  } else {
+    showLoginModal("login");
+  }
+});
 
         function showProfileModal() {
   // Remove existing modals to prevent duplicates
@@ -1133,37 +1373,47 @@ function urlBase64ToUint8Array(base64String) {
         const pages = document.querySelectorAll(".page-content");
 
         function showPage(pageId) {
-          pages.forEach(page => page.classList.add("hidden"));
-          document.getElementById(pageId).classList.remove("hidden");
+  pages.forEach(page => page.classList.add("hidden"));
+  document.getElementById(pageId).classList.remove("hidden");
 
-          navItems.forEach(item => {
-            item.classList.remove("text-primary");
-            item.classList.add("text-gray-500");
-            const icon = item.querySelector("i");
-            if (icon) {
-              icon.classList.remove("ri-home-4-fill", "ri-calendar-2-fill", "ri-star-smile-fill", "ri-links-fill");
-              icon.classList.add(
-                item.getAttribute("data-page") === "home-page" ? "ri-home-4-line" :
-                item.getAttribute("data-page") === "calendar-page" ? "ri-calendar-2-line" :
-                item.getAttribute("data-page") === "ratings-page" ? "ri-star-smile-line" :
-                "ri-links-line"
-              );
-            }
-          });
-          const activeItem = document.querySelector(`[data-page="${pageId}"]`);
-          activeItem.classList.remove("text-gray-500");
-          activeItem.classList.add("text-primary");
-          const activeIcon = activeItem.querySelector("i");
-          if (activeIcon) {
-            activeIcon.classList.remove("ri-home-4-line", "ri-calendar-2-line", "ri-star-smile-line", "ri-links-line");
-            activeIcon.classList.add(
-              pageId === "home-page" ? "ri-home-4-fill" :
-              pageId === "calendar-page" ? "ri-calendar-2-fill" :
-              pageId === "ratings-page" ? "ri-star-smile-fill" :
-              "ri-links-fill"
-            );
-          }
-        }
+  navItems.forEach(item => {
+    item.classList.remove("text-primary");
+    item.classList.remove("active-tab");
+    item.style.cssText = 'fill: rgb(107 114 128 / var(--tw-text-opacity, 1));';
+    item.classList.add("text-gray-500");
+    item.classList.add("inactive-tab");
+    const icon = item.querySelector("i");
+    if (icon) {
+      icon.classList.remove("ri-home-4-fill", "ri-calendar-2-fill", "ri-star-smile-fill", "ri-links-fill", "ri-restroom-fill");
+      icon.classList.add(
+        item.getAttribute("data-page") === "home-page" ? "ri-home-4-line" :
+        item.getAttribute("data-page") === "calendar-page" ? "ri-calendar-2-line" :
+        item.getAttribute("data-page") === "ratings-page" ? "ri-star-smile-line" :
+        item.getAttribute("data-page") === "more-page" ? "ri-links-line" :
+        item.getAttribute("data-page") === "toilets-page" ? "ri-restroom-line" :
+        ""
+      );
+    }
+  });
+  const activeItem = document.querySelector(`[data-page="${pageId}"]`);
+  activeItem.classList.remove("text-gray-500");
+  activeItem.classList.remove("inactive-tab");
+  activeItem.style.cssText = 'fill: var(--white-color) !important;';
+  activeItem.classList.add("text-primary");
+  activeItem.classList.add("active-tab");
+  const activeIcon = activeItem.querySelector("i");
+  if (activeIcon) {
+    activeIcon.classList.remove("ri-home-4-line", "ri-calendar-2-line", "ri-star-smile-line", "ri-links-line", "ri-restroom-line");
+    activeIcon.classList.add(
+      pageId === "home-page" ? "ri-home-4-fill" :
+      pageId === "calendar-page" ? "ri-calendar-2-fill" :
+      pageId === "ratings-page" ? "ri-star-smile-fill" :
+      pageId === "more-page" ? "ri-links-fill" :
+      pageId === "toilets-page" ? "ri-restroom-fill" :
+      ""
+    );
+  }
+}
 
         navItems.forEach(item => {
           item.addEventListener("click", function (e) {
@@ -1481,6 +1731,7 @@ function urlBase64ToUint8Array(base64String) {
   }
 });
 
+
         // Load Calendar
         async function loadCalendar(filter = "all") {
   const calendarGrid = document.getElementById("calendar-grid");
@@ -1752,25 +2003,29 @@ function urlBase64ToUint8Array(base64String) {
         const eventId = this.getAttribute("data-event-id");
         const docRef = doc(db, "events", eventId);
         const docSnap = await getDoc(docRef);
-        const event = docSnap.data();
-        const startDate = event.date && event.date.toDate ? event.date.toDate() : new Date();
-        const endDate = event.endDate && typeof event.endDate === 'object' && event.endDate.toDate ? event.endDate.toDate() : null;
-        const dateDisplay = endDate && endDate.getDate() !== startDate.getDate()
-          ? `${startDate.toLocaleDateString('fr-FR')} - ${endDate.toLocaleDateString('fr-FR')}`
-          : startDate.toLocaleDateString('fr-FR');
-        const eventDialog = document.createElement("div");
-        eventDialog.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-        eventDialog.innerHTML = `
-          <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
-            <h4 class="font-bold text-md mb-4">${event.title || 'Sans titre'}</h4>
-            <p class="text-gray-600 mb-2">${dateDisplay} ${event.startTime || 'N/A'} - ${event.endTime || 'N/A'}</p>
-            <p class="text-gray-600 mb-2">${event.location || 'Lieu non spécifié'}</p>
-            <p class="text-gray-600 mb-4">${event.description || 'Aucune description'}</p>
-            <button class="w-full bg-blue-500 text-white py-2 rounded">Fermer</button>
-          </div>
-        `;
-        document.body.appendChild(eventDialog);
-        eventDialog.querySelector("button").onclick = () => eventDialog.remove();
+        if (docSnap.exists()) {
+          const event = docSnap.data();
+          const startDate = event.date && event.date.toDate ? event.date.toDate() : new Date();
+          const endDate = event.endDate && typeof event.endDate === 'object' && event.endDate.toDate ? event.endDate.toDate() : null;
+          const dateDisplay = endDate && endDate.getDate() !== startDate.getDate()
+            ? `${startDate.toLocaleDateString('fr-FR')} - ${endDate.toLocaleDateString('fr-FR')}`
+            : startDate.toLocaleDateString('fr-FR');
+          const eventDialog = document.createElement("div");
+          eventDialog.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+          eventDialog.innerHTML = `
+            <div class="bg-white rounded-md p-6 m-4 max-w-sm w-full">
+              <h4 class="font-bold text-md mb-4">${event.title || 'Sans titre'}</h4>
+              <p class="text-gray-600 mb-2">${dateDisplay} ${event.startTime || 'N/A'} - ${event.endTime || 'N/A'}</p>
+              <p class="text-gray-600 mb-2">${event.location || 'Lieu non spécifié'}</p>
+              <p class="text-gray-600 mb-4">${event.description || 'Aucune description'}</p>
+              <button class="w-full bg-blue-500 text-white py-2 rounded">Fermer</button>
+            </div>
+          `;
+          document.body.appendChild(eventDialog);
+          eventDialog.querySelector("button").onclick = () => eventDialog.remove();
+        } else {
+          console.error("Event not found:", eventId);
+        }
       });
     });
 
@@ -1789,40 +2044,134 @@ function urlBase64ToUint8Array(base64String) {
 
         // Load Ratings
         async function loadRatings() {
-          const ratingsList = document.getElementById("ratings-list");
-          ratingsList.innerHTML = '<p class="text-gray-600">Chargement...</p>';
+  const ratingsList = document.getElementById("ratings-list");
+  if (!ratingsList) {
+    console.error("Élément ratings-list non trouvé dans le DOM");
+    return;
+  }
+  ratingsList.innerHTML = '<p class="text-gray-600">Chargement...</p>';
 
-          try {
-            const q = query(collection(db, "ratings"), orderBy("createdAt", "desc"), limit(10));
-            const snapshot = await getDocs(q);
+  try {
+    const q = query(collection(db, "ratings"), orderBy("createdAt", "desc"), limit(10));
+    const snapshot = await getDocs(q);
 
-            ratingsList.innerHTML = snapshot.empty ? '<p class="text-gray-600">Aucune évaluation disponible</p>' : '';
+    ratingsList.innerHTML = snapshot.empty ? '<p class="text-gray-600">Aucune évaluation disponible</p>' : '';
 
-            snapshot.forEach(doc => {
-              const rating = doc.data();
-              const date = rating.createdAt && rating.createdAt.toDate ? rating.createdAt.toDate() : new Date();
-              ratingsList.innerHTML += `
-                <div class="bg-white rounded-md p-4 shadow-sm">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <h4 class="font-semibold text-gray-800">${rating.eventTitle || 'Sans titre'}</h4>
-                      <p class="text-sm text-gray-600 mt-1">${date.toLocaleDateString('fr-FR')}</p>
-                    </div>
-                    <div class="flex">
-                      ${Array(5).fill(0).map((_, i) => `
-                        <i class="ri-${i < (rating.rating || 0) ? 'star-fill' : 'star-line'} text-yellow-400"></i>
-                      `).join('')}
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-700 mt-2">${rating.comment || 'Aucun commentaire'}</p>
-                </div>
-              `;
-            });
-          } catch (error) {
-            console.error("Error loading ratings:", error);
-            ratingsList.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
-          }
+    snapshot.forEach(doc => {
+      const rating = doc.data();
+      const date = rating.createdAt && rating.createdAt.toDate ? rating.createdAt.toDate() : new Date();
+      const isAdmin = typeof userRole !== 'undefined' && userRole === "admin"; // Vérification explicite
+
+      ratingsList.innerHTML += `
+        <div class="bg-white rounded-md p-4 shadow-sm" data-rating-id="${doc.id}">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-semibold text-gray-800">${rating.eventTitle || 'Sans titre'}</h4>
+              <p class="text-sm text-gray-600 mt-1">${date.toLocaleDateString('fr-FR')}</p>
+            </div>
+            <div class="flex items-center">
+              ${Array(5).fill(0).map((_, i) => `
+                <i class="ri-${i < (rating.rating || 0) ? 'star-fill' : 'star-line'} text-yellow-400"></i>
+              `).join('')}
+              ${isAdmin ? `
+                <button class="edit-rating text-blue-600 text-sm font-medium cursor-pointer ml-4" data-rating-id="${doc.id}">Modifier</button>
+                <button class="delete-rating text-red-600 text-sm font-medium cursor-pointer ml-2" data-rating-id="${doc.id}">Supprimer</button>
+              ` : ''}
+            </div>
+          </div>
+          <p class="text-sm text-gray-700 mt-2">${rating.comment || 'Aucun commentaire'}</p>
+        </div>
+      `;
+    });
+
+    // Ajouter les écouteurs après le rendu
+    document.querySelectorAll(".edit-rating").forEach(button => {
+      button.addEventListener("click", () => editRating(button.getAttribute("data-rating-id")));
+    });
+    document.querySelectorAll(".delete-rating").forEach(button => {
+      button.addEventListener("click", () => deleteRating(button.getAttribute("data-rating-id")));
+    });
+  } catch (error) {
+    console.error("Error loading ratings:", error);
+    ratingsList.innerHTML = '<p class="text-red-500">Erreur de chargement</p>';
+  }
+}
+
+function editRating(ratingId) {
+  const docRef = doc(db, "ratings", ratingId);
+  getDoc(docRef).then(docSnap => {
+    if (docSnap.exists()) {
+      const rating = docSnap.data();
+      const modal = document.createElement("div");
+      modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+      modal.innerHTML = `
+        <div class="bg-white rounded-md p-6 m-4 max-w-md w-full">
+          <h3 class="text-md font-semibold text-gray-800 mb-4">Modifier l'évaluation</h3>
+          <form id="editRatingForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Titre de l'événement</label>
+              <input type="text" name="eventTitle" value="${rating.eventTitle || ''}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Note (1-5)</label>
+              <input type="number" name="rating" min="1" max="5" value="${rating.rating || 1}" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Commentaire</label>
+              <textarea name="comment" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary">${rating.comment || ''}</textarea>
+            </div>
+            <div id="edit-error" class="text-red-500 text-sm hidden"></div>
+            <div class="flex space-x-3 pt-4">
+              <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-button hover:bg-gray-200" id="cancelEditBtn">Annuler</button>
+              <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90">Sauvegarder</button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      const form = modal.querySelector("#editRatingForm");
+      const cancelBtn = modal.querySelector("#cancelEditBtn");
+      const errorDiv = modal.querySelector("#edit-error");
+
+      cancelBtn.onclick = () => modal.remove();
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        try {
+          await updateDoc(docRef, {
+            eventTitle: data.eventTitle,
+            rating: parseInt(data.rating),
+            comment: data.comment,
+            createdAt: serverTimestamp()
+          });
+          modal.remove();
+          loadRatings(); // Recharger la liste des avis
+        } catch (error) {
+          console.error("Erreur lors de la modification:", error);
+          errorDiv.textContent = `Erreur : ${error.message}`;
+          errorDiv.classList.remove("hidden");
         }
+      });
+    } else {
+      console.error("Évaluation non trouvée:", ratingId);
+    }
+  }).catch(error => console.error("Erreur de récupération:", error));
+}
+
+function deleteRating(ratingId) {
+  if (confirm("Êtes-vous sûr de vouloir supprimer cette évaluation ?")) {
+    const docRef = doc(db, "ratings", ratingId);
+    deleteDoc(docRef)
+      .then(() => {
+        console.log("Évaluation supprimée avec succès");
+        loadRatings(); // Recharger la liste des avis
+      })
+      .catch(error => console.error("Erreur lors de la suppression:", error));
+  }
+}
 
         // Filters
         const filterButton = document.getElementById("filter-btn");
